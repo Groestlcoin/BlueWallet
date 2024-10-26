@@ -11,7 +11,7 @@
     "@babel/runtime": "^7.20.0",
     "@jest/reporters": "^27.5.1",
     "@react-native/babel-preset": "^0.75.4",
-    "@react-native/eslint-config": "^0.75.4",
+    "@react-native/eslint-config": "^0.76.0",
     "@react-native/js-polyfills": "^0.75.4",
     "@react-native/metro-babel-transformer": "^0.75.4",
     "@react-native/typescript-config": "^0.75.4",
@@ -75,7 +75,7 @@
   },
   "dependencies": {
     "@babel/preset-env": "7.25.8",
-    "@bugsnag/react-native": "8.0.0",
+    "@bugsnag/react-native": "8.1.2",
     "@bugsnag/source-maps": "2.3.3",
     "@keystonehq/bc-ur-registry": "0.7.0",
     "@lodev09/react-native-true-sheet": "github:BlueWallet/react-native-true-sheet#839f2966cee77c0ad99d09609dadb61a338e7f54",
