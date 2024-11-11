@@ -16,7 +16,7 @@
     "AMD": {
         "endPointKey": "AMD",
         "locale": "hy-AM",
-        "source": "CoinDesk",
+        "source": "CoinGecko",
         "symbol": "֏",
         "country": "Armenia (Armenian Dram)"
     },

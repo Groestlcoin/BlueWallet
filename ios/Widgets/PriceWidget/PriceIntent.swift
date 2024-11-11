@@ -9,13 +9,13 @@ import SwiftUI
 @available(iOS 16.0, *)
 struct PriceIntent: AppIntent {
     // MARK: - Intent Metadata
-    
+
     static var title: LocalizedStringResource = "Market Rate"
-    static var description = IntentDescription("View the current Bitcoin market rate in your preferred currency.")
+    static var description = IntentDescription("View the current Groestlcoin market rate in your preferred currency.")
     static var openAppWhenRun: Bool { false }
 
     // MARK: - Parameters
-    
+
     @Parameter(
         title: "Currency",
         description: "Choose your preferred currency."
@@ -29,14 +29,14 @@ struct PriceIntent: AppIntent {
         } else {
             print("fiatCurrency parameter not provided. Proceeding with fallback logic.")
         }
-        
+
         // Determine the fiat currency to use:
         // 1. Use the fiatCurrency parameter if provided
         // 2. Fallback to Shared Group UserDefaults
         // 3. Fallback to Device's preferred currency
         // 4. Default to USD
         let selectedFiatCurrency: FiatUnitEnum
-        
+
         if let fiat = fiatCurrency {
             selectedFiatCurrency = fiat
             print("Using fiatCurrency parameter: \(selectedFiatCurrency.rawValue)")
@@ -52,7 +52,7 @@ struct PriceIntent: AppIntent {
             selectedFiatCurrency = .USD
             print("Defaulting to USD.")
         }
-        
+
         let dataSource = selectedFiatCurrency.source
         print("Data Source: \(dataSource)")
 
@@ -85,7 +85,7 @@ struct PriceIntent: AppIntent {
 
             return .result(
                 value: 0.0,
-                dialog: "Failed to retrieve the Bitcoin market rate.",
+                dialog: "Failed to retrieve the Groestlcoin market rate.",
                 view: errorView
             )
         }
@@ -105,13 +105,13 @@ struct PriceIntent: AppIntent {
 
         return .result(
             value: priceDouble,
-            dialog: "Current Bitcoin Market Rate",
+            dialog: "Current Groestlcoin Market Rate",
             view: view
         )
     }
 
     // MARK: - Helper Methods
-    
+
     private func formattedDate(from isoString: String?) -> String {
         guard let isoString = isoString else { return "--" }
         let isoFormatter = ISO8601DateFormatter()
@@ -123,13 +123,13 @@ struct PriceIntent: AppIntent {
         }
         return "--"
     }
-    
+
     private func formatPrice(_ price: Double, currencyCode: String) -> String {
         let formatter = NumberFormatter()
         formatter.numberStyle = .currency
         formatter.locale = Locale.current // Use device's current locale
         formatter.currencyCode = currencyCode
-        
+
         // Omit cents if price is a whole number
         if price.truncatingRemainder(dividingBy: 1) == 0 {
             formatter.maximumFractionDigits = 0
@@ -145,7 +145,7 @@ struct PriceIntent: AppIntent {
 
         return formattedNumber
     }
-    
+
     private func getCurrencySymbol(for currencyCode: String) -> String {
         let formatter = NumberFormatter()
         formatter.numberStyle = .currency
@@ -153,7 +153,7 @@ struct PriceIntent: AppIntent {
         formatter.currencyCode = currencyCode
         return formatter.currencySymbol
     }
-    
+
     private func getSharedCurrencyCode() -> String? {
         let sharedDefaults = UserDefaults(suiteName: UserDefaultsGroupKey.GroupName.rawValue)
         return sharedDefaults?.string(forKey: UserDefaultsGroupKey.PreferredCurrency.rawValue)

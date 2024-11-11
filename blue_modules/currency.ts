@@ -55,9 +55,9 @@ function getBTCFormatter(): Intl.NumberFormat {
       minimumFractionDigits: 8,
       maximumFractionDigits: 8,
     });
-    console.debug('Created new BTC formatter');
+    console.debug('Created new GRS formatter');
   } else {
-    console.debug('Using cached BTC formatter');
+    console.debug('Using cached GRS formatter');
   }
   return btcFormatter;
 }

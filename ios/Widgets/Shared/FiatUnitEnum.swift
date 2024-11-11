@@ -5,7 +5,7 @@ import AppIntents
 
 @available(iOS 16.0, *)
 enum FiatUnitEnum: String, AppEnum, CaseIterable, Identifiable, Codable {
-  
+
   var id: String { self.rawValue }
 
     case AED
@@ -75,11 +75,11 @@ enum FiatUnitEnum: String, AppEnum, CaseIterable, Identifiable, Codable {
         case .AED:
             return "CoinGecko"
         case .ARS:
-            return "Yadio"
+            return "CoinGecko"
         case .AUD:
             return "CoinGecko"
         case .AWG:
-            return "CoinDesk"
+            return "CoinGecko"
         case .BHD:
             return "CoinGecko"
         case .BRL:
@@ -89,21 +89,21 @@ enum FiatUnitEnum: String, AppEnum, CaseIterable, Identifiable, Codable {
         case .CHF:
             return "CoinGecko"
         case .CLP:
-            return "Yadio"
+            return "CoinGecko"
         case .CNY:
-            return "Coinbase"
+            return "CoinGecko"
         case .COP:
-            return "CoinDesk"
+            return "CoinGecko"
         case .CZK:
             return "CoinGecko"
         case .DKK:
             return "CoinGecko"
         case .EUR:
-            return "Kraken"
+            return "CoinGecko"
         case .GBP:
-            return "Kraken"
+            return "CoinGecko"
         case .HRK:
-            return "CoinDesk"
+            return "CoinGecko"
         case .HUF:
             return "CoinGecko"
         case .IDR:
@@ -111,23 +111,23 @@ enum FiatUnitEnum: String, AppEnum, CaseIterable, Identifiable, Codable {
         case .ILS:
             return "CoinGecko"
         case .INR:
-            return "coinpaprika"
+            return "CoinGecko"
         case .IRR:
-            return "Exir"
+            return "CoinGecko"
         case .IRT:
-            return "Exir"
+            return "CoinGecko"
         case .ISK:
-            return "CoinDesk"
+            return "CoinGecko"
         case .JPY:
             return "CoinGecko"
         case .KES:
-            return "CoinDesk"
+            return "CoinGecko"
         case .KRW:
             return "CoinGecko"
         case .KWD:
             return "CoinGecko"
         case .LBP:
-            return "YadioConvert"
+            return "CoinGecko"
         case .LKR:
             return "CoinGecko"
         case .MXN:
@@ -135,7 +135,7 @@ enum FiatUnitEnum: String, AppEnum, CaseIterable, Identifiable, Codable {
         case .MYR:
             return "CoinGecko"
         case .MZN:
-            return "CoinDesk"
+            return "CoinGecko"
         case .NGN:
             return "CoinGecko"
         case .NOK:
@@ -143,15 +143,15 @@ enum FiatUnitEnum: String, AppEnum, CaseIterable, Identifiable, Codable {
         case .NZD:
             return "CoinGecko"
         case .OMR:
-            return "CoinDesk"
+            return "CoinGecko"
         case .PHP:
             return "CoinGecko"
         case .PLN:
             return "CoinGecko"
         case .QAR:
-            return "CoinDesk"
+            return "CoinGecko"
         case .RON:
-            return "BNR"
+            return "CoinGecko"
         case .RUB:
             return "CoinGecko"
         case .SAR:
@@ -167,25 +167,25 @@ enum FiatUnitEnum: String, AppEnum, CaseIterable, Identifiable, Codable {
         case .TWD:
             return "CoinGecko"
         case .TZS:
-            return "CoinDesk"
+            return "CoinGecko"
         case .UAH:
             return "CoinGecko"
         case .UGX:
-            return "CoinDesk"
+            return "CoinGecko"
         case .USD:
-            return "Kraken"
+            return "CoinGecko"
         case .UYU:
-            return "CoinDesk"
+            return "CoinGecko"
         case .VEF:
             return "CoinGecko"
         case .VES:
-            return "Yadio"
+            return "CoinGecko"
         case .XAF:
-            return "CoinDesk"
+            return "CoinGecko"
         case .ZAR:
             return "CoinGecko"
         case .GHS:
-            return "CoinDesk"
+            return "CoinGecko"
         }
     }
 
@@ -255,4 +255,3 @@ enum FiatUnitEnum: String, AppEnum, CaseIterable, Identifiable, Codable {
         ]
     }
 }
-

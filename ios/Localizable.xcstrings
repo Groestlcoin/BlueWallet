@@ -22,16 +22,16 @@
     "Balance" : {
 
     },
-    "Bitcoin (%@)" : {
+    "Groestlcoin (%@)" : {
 
     },
-    "Bitcoin price: %@" : {
+    "Groestlcoin price: %@" : {
 
     },
     "Brazil (Brazilian Real)" : {
 
     },
-    "BTC" : {
+    "GRS" : {
 
     },
     "Canada (Canadian Dollar)" : {
@@ -67,10 +67,10 @@
     "Currency: %@" : {
 
     },
-    "Current Bitcoin Market Rate" : {
+    "Current Groestlcoin Market Rate" : {
 
     },
-    "Current Bitcoin Price: %@" : {
+    "Current Groestlcoin Price: %@" : {
 
     },
     "Czech Republic (Czech Koruna)" : {
@@ -82,7 +82,7 @@
     "European Union (Euro)" : {
 
     },
-    "Failed to retrieve the Bitcoin market rate." : {
+    "Failed to retrieve the Groestlcoin market rate." : {
 
     },
     "Fiat Currency" : {
@@ -266,22 +266,22 @@
     "Venezuela (Venezuelan Bolívar Soberano)" : {
 
     },
-    "View the current Bitcoin market rate in your preferred currency." : {
+    "View the current Groestlcoin market rate in your preferred currency." : {
 
     },
-    "View the current Bitcoin market rate in your preferred fiat currency." : {
+    "View the current Groestlcoin market rate in your preferred fiat currency." : {
 
     },
-    "View the current Bitcoin market rate." : {
+    "View the current Groestlcoin market rate." : {
 
     },
     "View the current market information." : {
 
     },
-    "View the current price of Bitcoin" : {
+    "View the current price of Groestlcoin" : {
 
     },
-    "View the current price of Bitcoin." : {
+    "View the current price of Groestlcoin." : {
 
     },
     "View your accumulated balance." : {

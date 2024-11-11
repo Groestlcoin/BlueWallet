@@ -14,7 +14,7 @@ struct CompactPriceView: View {
                 .bold()
                 .multilineTextAlignment(.center)
                 .dynamicTypeSize(.large ... .accessibility5)
-                .accessibilityLabel("Bitcoin price: \(price)")
+                .accessibilityLabel("Groestlcoin price: \(price)")
 
             VStack(alignment: .center, spacing: 8) {
                 Text("\(code)")
