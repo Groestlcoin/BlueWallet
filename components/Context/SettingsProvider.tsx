@@ -1,7 +1,6 @@
-import { useAsyncStorage } from '@react-native-async-storage/async-storage';
 import React, { createContext, useCallback, useEffect, useMemo, useState } from 'react';
 import DefaultPreference from 'react-native-default-preference';
-import BlueClipboard from '../../blue_modules/clipboard';
+import { isReadClipboardAllowed, setReadClipboardAllowed } from '../../blue_modules/clipboard';
 import { getPreferredCurrency, GROUP_IO_BLUEWALLET, initCurrencyDaemon, PREFERRED_CURRENCY_STORAGE_KEY } from '../../blue_modules/currency';
 import { clearUseURv1, isURv1Enabled, setUseURv1 } from '../../blue_modules/ur';
 import { BlueApp } from '../../class';
@@ -9,11 +8,13 @@ import { saveLanguage, STORAGE_KEY } from '../../loc';
 import { FiatUnit, TFiatUnit } from '../../models/fiatUnit';
 import { getEnabled as getIsDeviceQuickActionsEnabled, setEnabled as setIsDeviceQuickActionsEnabled } from '../DeviceQuickActions';
 import { getIsHandOffUseEnabled, setIsHandOffUseEnabled } from '../HandOffComponent';
-import { isBalanceDisplayAllowed, setBalanceDisplayAllowed } from '../WidgetCommunication';
 import { useStorage } from '../../hooks/context/useStorage';
 import { BitcoinUnit } from '../../models/bitcoinUnits';
 import { TotalWalletsBalanceKey, TotalWalletsBalancePreferredUnit } from '../TotalWalletsBalance';
 import { BLOCK_EXPLORERS, getBlockExplorerUrl, saveBlockExplorer, BlockExplorer, normalizeUrl } from '../../models/blockExplorer';
+import * as BlueElectrum from '../../blue_modules/BlueElectrum';
+import { isBalanceDisplayAllowed, setBalanceDisplayAllowed } from '../../hooks/useWidgetCommunication';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const getDoNotTrackStorage = async (): Promise<boolean> => {
   try {
@@ -76,7 +77,7 @@ interface SettingsContextType {
   isHandOffUseEnabled: boolean;
   setIsHandOffUseEnabledAsyncStorage: (value: boolean) => Promise<void>;
   isPrivacyBlurEnabled: boolean;
-  setIsPrivacyBlurEnabledState: (value: boolean) => void;
+  setIsPrivacyBlurEnabled: (value: boolean) => void;
   isDoNotTrackEnabled: boolean;
   setDoNotTrackStorage: (value: boolean) => Promise<void>;
   isWidgetBalanceDisplayAllowed: boolean;
@@ -95,6 +96,8 @@ interface SettingsContextType {
   setIsDrawerShouldHide: (value: boolean) => void;
   selectedBlockExplorer: BlockExplorer;
   setBlockExplorerStorage: (explorer: BlockExplorer) => Promise<boolean>;
+  isElectrumDisabled: boolean;
+  setIsElectrumDisabled: (value: boolean) => void;
 }
 
 const defaultSettingsContext: SettingsContextType = {
@@ -105,7 +108,7 @@ const defaultSettingsContext: SettingsContextType = {
   isHandOffUseEnabled: false,
   setIsHandOffUseEnabledAsyncStorage: async () => {},
   isPrivacyBlurEnabled: true,
-  setIsPrivacyBlurEnabledState: () => {},
+  setIsPrivacyBlurEnabled: () => {},
   isDoNotTrackEnabled: false,
   setDoNotTrackStorage: async () => {},
   isWidgetBalanceDisplayAllowed: true,
@@ -124,6 +127,8 @@ const defaultSettingsContext: SettingsContextType = {
   setIsDrawerShouldHide: () => {},
   selectedBlockExplorer: BLOCK_EXPLORERS.default,
   setBlockExplorerStorage: async () => false,
+  isElectrumDisabled: false,
+  setIsElectrumDisabled: () => {},
 };
 
 export const SettingsContext = createContext<SettingsContextType>(defaultSettingsContext);
@@ -142,8 +147,8 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = React.m
   const [totalBalancePreferredUnit, setTotalBalancePreferredUnit] = useState<BitcoinUnit>(BitcoinUnit.BTC);
   const [isDrawerShouldHide, setIsDrawerShouldHide] = useState<boolean>(false);
   const [selectedBlockExplorer, setSelectedBlockExplorer] = useState<BlockExplorer>(BLOCK_EXPLORERS.default);
+  const [isElectrumDisabled, setIsElectrumDisabled] = useState<boolean>(true);
 
-  const languageStorage = useAsyncStorage(STORAGE_KEY);
   const { walletsInitialized } = useStorage();
 
   useEffect(() => {
@@ -155,10 +160,13 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = React.m
       }
 
       const promises: Promise<void>[] = [
+        BlueElectrum.isDisabled().then(disabled => {
+          setIsElectrumDisabled(disabled);
+        }),
         getIsHandOffUseEnabled().then(handOff => {
           setIsHandOffUseEnabledState(handOff);
         }),
-        languageStorage.getItem().then(lang => {
+        AsyncStorage.getItem(STORAGE_KEY).then(lang => {
           setLanguage(lang ?? 'en');
         }),
         isBalanceDisplayAllowed().then(balanceDisplayAllowed => {
@@ -167,11 +175,9 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = React.m
         isURv1Enabled().then(urv1Enabled => {
           setIsLegacyURv1Enabled(urv1Enabled);
         }),
-        BlueClipboard()
-          .isReadClipboardAllowed()
-          .then(clipboardEnabled => {
-            setIsClipboardGetContentEnabled(clipboardEnabled);
-          }),
+        isReadClipboardAllowed().then(clipboardEnabled => {
+          setIsClipboardGetContentEnabled(clipboardEnabled);
+        }),
         getIsDeviceQuickActionsEnabled().then(quickActionsEnabled => {
           setIsQuickActionsEnabled(quickActionsEnabled);
         }),
@@ -200,7 +206,7 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = React.m
     };
 
     loadSettings();
-  }, [languageStorage]);
+  }, []);
 
   useEffect(() => {
     if (walletsInitialized) {
@@ -215,6 +221,12 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = React.m
         });
     }
   }, [walletsInitialized]);
+
+  useEffect(() => {
+    if (walletsInitialized) {
+      isElectrumDisabled ? BlueElectrum.forceDisconnect() : BlueElectrum.connectMain();
+    }
+  }, [isElectrumDisabled, walletsInitialized]);
 
   const setPreferredFiatCurrencyStorage = useCallback(async (currency: TFiatUnit): Promise<void> => {
     try {
@@ -283,7 +295,7 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = React.m
 
   const setIsClipboardGetContentEnabledStorage = useCallback(async (value: boolean): Promise<void> => {
     try {
-      await BlueClipboard().setReadClipboardAllowed(value);
+      await setReadClipboardAllowed(value);
       setIsClipboardGetContentEnabled(value);
     } catch (e) {
       console.error('Error setting isClipboardGetContentEnabled:', e);
@@ -298,16 +310,6 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = React.m
       console.error('Error setting isQuickActionsEnabled:', e);
     }
   }, []);
-
-  const setIsPrivacyBlurEnabledState = useCallback((value: boolean): void => {
-    try {
-      setIsPrivacyBlurEnabled(value);
-      console.debug(`Privacy blur: ${value}`);
-    } catch (e) {
-      console.error('Error setting isPrivacyBlurEnabled:', e);
-    }
-  }, []);
-
   const setIsTotalBalanceEnabledStorage = useCallback(async (value: boolean): Promise<void> => {
     try {
       await setTotalBalanceViewEnabledStorage(value);
@@ -348,7 +350,7 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = React.m
       isHandOffUseEnabled,
       setIsHandOffUseEnabledAsyncStorage,
       isPrivacyBlurEnabled,
-      setIsPrivacyBlurEnabledState,
+      setIsPrivacyBlurEnabled,
       isDoNotTrackEnabled,
       setDoNotTrackStorage,
       isWidgetBalanceDisplayAllowed,
@@ -367,6 +369,8 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = React.m
       setIsDrawerShouldHide,
       selectedBlockExplorer,
       setBlockExplorerStorage,
+      isElectrumDisabled,
+      setIsElectrumDisabled,
     }),
     [
       preferredFiatCurrency,
@@ -376,7 +380,7 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = React.m
       isHandOffUseEnabled,
       setIsHandOffUseEnabledAsyncStorage,
       isPrivacyBlurEnabled,
-      setIsPrivacyBlurEnabledState,
+      setIsPrivacyBlurEnabled,
       isDoNotTrackEnabled,
       setDoNotTrackStorage,
       isWidgetBalanceDisplayAllowed,
@@ -395,6 +399,7 @@ export const SettingsProvider: React.FC<{ children: React.ReactNode }> = React.m
       setIsDrawerShouldHide,
       selectedBlockExplorer,
       setBlockExplorerStorage,
+      isElectrumDisabled,
     ],
   );
 

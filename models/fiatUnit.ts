@@ -4,24 +4,39 @@ export const FiatUnitSource = {
   CoinGecko: 'CoinGecko',
 } as const;
 
+const handleError = (source: string, ticker: string, error: Error) => {
+  throw new Error(
+    `Could not update rate for ${ticker} from ${source}: ${error.message}. ` + `Make sure the network you're on has access to ${source}.`,
+  );
+};
+
+const fetchRate = async (url: string): Promise<unknown> => {
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+  return await response.json();
+};
+
+interface CoinGeckoResponse {
+  groestlcoin: {
+    [ticker: string]: number;
+  };
+}
+
 const RateExtractors = {
   CoinGecko: async (ticker: string): Promise<number> => {
-    let json;
     try {
-      const res = await fetch(`https://api.coingecko.com//api/v3/coins/groestlcoin?localization=false&community_data=false&developer_data=false&sparkline=false`);
-      json = await res.json();
-    } catch (e: any) {
-      throw new Error(`Could not update rate for ${ticker}: ${e.message}`);
+      const json = (await fetchRate(
+        `https://api.coingecko.com/api/v3/simple/price?ids=groestlcoin&vs_currencies=${ticker.toLowerCase()}`,
+      )) as CoinGeckoResponse;
+      const rate = Number(json?.groestlcoin?.[ticker.toLowerCase()]);
+      if (!(rate >= 0)) throw new Error('Invalid data received');
+      return rate;
+    } catch (error: any) {
+      handleError('CoinGecko', ticker, error);
+      return undefined as never;
     }
-    let rate = json?.market_data?.current_price?.[ticker.toLowerCase()]; // eslint-disable-line
-    if (!rate) throw new Error(`Could not update rate for ${ticker}: data is wrong`);
-
-    const parsedRate = Number(rate);
-    if (isNaN(parsedRate) || parsedRate <= 0) {
-      throw new Error(`Could not update rate for ${ticker}: data is wrong`);
-    }
-
-    return parsedRate;
   },
 } as const;
 

@@ -10,6 +10,7 @@
     "never": "Never",
     "of": "{number} of {total}",
     "ok": "OK",
+    "customize": "Customize",
     "enter_url": "Enter URL",
     "storage_is_encrypted": "Your storage is encrypted. Password is required to decrypt it.",
     "yes": "Yes",
@@ -335,7 +336,6 @@
     "details_balance_hide": "Hide Balance",
     "details_balance_show": "Show Balance",
     "details_copy": "Copy",
-    "details_copy_amount": "Copy Amount",
     "details_copy_block_explorer_link": "Copy Block Explorer Link",
     "details_copy_note": "Copy Note",
     "details_copy_txid": "Copy Transaction ID",
@@ -382,6 +382,8 @@
     "add_bitcoin_explain": "Simple and powerful Groestlcoin wallet",
     "add_create": "Create",
     "total_balance": "Total Balance",
+    "add_entropy_reset_title": "Reset Entropy",
+    "add_entropy_reset_message": "Changing the wallet type will reset the current entropy. Do you want to proceed?",
     "add_entropy": "Entropy",
     "add_entropy_bytes": "{bytes} bytes of entropy",
     "add_entropy_generated": "{gen} bytes of generated entropy",
@@ -403,6 +405,7 @@
     "add_wallet_seed_length_24": "24 words",
     "clipboard_bitcoin": "You have a Groestlcoin address on your clipboard. Would you like to use it for a transaction?",
     "clipboard_lightning": "You have a Lightning invoice on your clipboard. Would you like to use it for a transaction?",
+    "clear_clipboard_on_import": "Clear clipboard on import",
     "details_address": "Address",
     "details_advanced": "Advanced",
     "details_are_you_sure": "Are you sure?",
@@ -483,9 +486,10 @@
     "more_info": "More Info"
   },
   "total_balance_view": {
-    "view_in_bitcoin": "View in Groestlcoin",
-    "view_in_sats": "View in gros",
-    "view_in_fiat": "View in {currency}",
+    "display_in_bitcoin": "Display in Groestlcoin",
+    "hide": "Hide",
+    "display_in_sats": "Display in gros",
+    "display_in_fiat": "Display in {currency}",
     "title": "Total Balance",
     "explanation": "View the total balance of all your wallets in the overview screen."
   },
@@ -588,7 +592,13 @@
     "header": "Coin Control",
     "use_coin": "Use Coin",
     "use_coins": "Use Coins",
-    "tip": "This feature allows you to see, label, freeze or select coins for improved wallet management. You can select multiple coins by tapping on the colored circles."
+    "tip": "This feature allows you to see, label, freeze or select coins for improved wallet management. You can select multiple coins by tapping on the colored circles.",
+    "sort_asc": "Ascending",
+    "sort_desc": "Descending",
+    "sort_height": "by Height",
+    "sort_value": "by Value",
+    "sort_label": "by Label",
+    "sort_status": "by Status"
   },
   "units": {
     "BTC": "GRS",

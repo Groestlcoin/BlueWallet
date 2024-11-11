@@ -14,7 +14,9 @@ import {
 import { CommonToolTipActions } from '../../typings/CommonToolTipActions';
 import { useKeyboard } from '../../hooks/useKeyboard';
 import { useExtendedNavigation } from '../../hooks/useExtendedNavigation';
+import Clipboard from '@react-native-clipboard/clipboard';
 import HeaderMenuButton from '../../components/HeaderMenuButton';
+import { useSettings } from '../../hooks/context/useSettings';
 
 const WalletsImport = () => {
   const navigation = useExtendedNavigation();
@@ -26,9 +28,10 @@ const WalletsImport = () => {
   const [importText, setImportText] = useState(label);
   const [isToolbarVisibleForAndroid, setIsToolbarVisibleForAndroid] = useState(false);
   const [, setSpeedBackdoor] = useState(0);
-  const [searchAccounts, setSearchAccounts] = useState(false);
-  const [askPassphrase, setAskPassphrase] = useState(false);
-
+  const [searchAccountsMenuState, setSearchAccountsMenuState] = useState(false);
+  const [askPassphraseMenuState, setAskPassphraseMenuState] = useState(false);
+  const [clearClipboardMenuState, setClearClipboardMenuState] = useState(true);
+  const { isPrivacyBlurEnabled } = useSettings();
   // Styles
   const styles = StyleSheet.create({
     root: {
@@ -59,11 +62,11 @@ const WalletsImport = () => {
   });
 
   useEffect(() => {
-    disallowScreenshot(true);
+    disallowScreenshot(isPrivacyBlurEnabled);
     return () => {
       disallowScreenshot(false);
     };
-  }, []);
+  }, [isPrivacyBlurEnabled]);
 
   useEffect(() => {
     if (triggerImport) importButtonPressed();
@@ -85,8 +88,21 @@ const WalletsImport = () => {
     importMnemonic(textToImport);
   };
 
-  const importMnemonic = text => {
-    navigation.navigate('ImportWalletDiscovery', { importText: text, askPassphrase, searchAccounts });
+  const importMnemonic = async text => {
+    if (clearClipboardMenuState) {
+      try {
+        if (await Clipboard.hasString()) {
+          Clipboard.setString('');
+        }
+      } catch (error) {
+        console.error('Failed to clear clipboard:', error);
+      }
+    }
+    navigation.navigate('ImportWalletDiscovery', {
+      importText: text,
+      askPassphrase: askPassphraseMenuState,
+      searchAccounts: searchAccountsMenuState,
+    });
   };
 
   const onBarScanned = value => {
@@ -113,24 +129,28 @@ const WalletsImport = () => {
 
   const toolTipOnPressMenuItem = useCallback(
     menuItem => {
+      Keyboard.dismiss();
       if (menuItem === CommonToolTipActions.Passphrase.id) {
-        setAskPassphrase(!askPassphrase);
+        setAskPassphraseMenuState(!askPassphraseMenuState);
       } else if (menuItem === CommonToolTipActions.SearchAccount.id) {
-        setSearchAccounts(!searchAccounts);
+        setSearchAccountsMenuState(!searchAccountsMenuState);
+      } else if (menuItem === CommonToolTipActions.ClearClipboard.id) {
+        setClearClipboardMenuState(!clearClipboardMenuState);
       }
     },
-    [askPassphrase, searchAccounts],
+    [askPassphraseMenuState, clearClipboardMenuState, searchAccountsMenuState],
   );
 
   // ToolTipMenu actions for advanced options
   const toolTipActions = useMemo(() => {
     const askPassphraseAction = CommonToolTipActions.Passphrase;
-    askPassphraseAction.menuState = askPassphrase;
-
+    askPassphraseAction.menuState = askPassphraseMenuState;
     const searchAccountsAction = CommonToolTipActions.SearchAccount;
-    searchAccountsAction.menuState = searchAccounts;
-    return [askPassphraseAction, searchAccountsAction];
-  }, [askPassphrase, searchAccounts]);
+    searchAccountsAction.menuState = searchAccountsMenuState;
+    const clearClipboardAction = CommonToolTipActions.ClearClipboard;
+    clearClipboardAction.menuState = clearClipboardMenuState;
+    return [askPassphraseAction, searchAccountsAction, clearClipboardAction];
+  }, [askPassphraseMenuState, clearClipboardMenuState, searchAccountsMenuState]);
 
   const HeaderRight = useMemo(
     () => <HeaderMenuButton onPressMenuItem={toolTipOnPressMenuItem} actions={toolTipActions} />,
@@ -142,7 +162,7 @@ const WalletsImport = () => {
     navigation.setOptions({
       headerRight: () => HeaderRight,
     });
-  }, [askPassphrase, searchAccounts, colors.foregroundColor, navigation, toolTipActions, HeaderRight]);
+  }, [colors.foregroundColor, navigation, toolTipActions, HeaderRight]);
 
   const renderOptionsAndImportButton = (
     <>

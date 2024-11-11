@@ -47,12 +47,14 @@ import ActionSheet from '../ActionSheet';
 import { useStorage } from '../../hooks/context/useStorage';
 import ToolTipMenu from '../../components/TooltipMenu';
 import { CommonToolTipActions } from '../../typings/CommonToolTipActions';
+import { useSettings } from '../../hooks/context/useSettings';
 
 const ViewEditMultisigCosigners: React.FC = () => {
   const hasLoaded = useRef(false);
   const { colors } = useTheme();
-  const { wallets, setWalletsWithNewOrder, isElectrumDisabled } = useStorage();
+  const { wallets, setWalletsWithNewOrder } = useStorage();
   const { isBiometricUseCapableAndEnabled } = useBiometrics();
+  const { isElectrumDisabled, isPrivacyBlurEnabled } = useSettings();
   const { navigate, dispatch, addListener } = useExtendedNavigation();
   const openScannerButtonRef = useRef();
   const route = useRoute();
@@ -189,7 +191,7 @@ const ViewEditMultisigCosigners: React.FC = () => {
       if (hasLoaded.current) return;
       setIsLoading(true);
 
-      disallowScreenshot(true);
+      disallowScreenshot(isPrivacyBlurEnabled);
 
       const task = InteractionManager.runAfterInteractions(async () => {
         if (!w.current) {
@@ -507,9 +509,7 @@ const ViewEditMultisigCosigners: React.FC = () => {
   const hideShareModal = () => {};
 
   const toolTipActions = useMemo(() => {
-    const passphrase = CommonToolTipActions.Passphrase;
-    passphrase.menuState = askPassphrase;
-    return [passphrase];
+    return [{ ...CommonToolTipActions.Passphrase, menuState: askPassphrase }];
   }, [askPassphrase]);
 
   const renderProvideMnemonicsModal = () => {

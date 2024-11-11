@@ -1,6 +1,5 @@
 import { Platform } from 'react-native';
 import loc from '../loc';
-import { Action } from '../components/types';
 
 const keys = {
   CopyTXID: 'copyTX_ID',
@@ -20,6 +19,7 @@ const keys = {
   Passphrase: 'passphrase',
   MoreInfo: 'moreInfo',
   SaveChanges: 'saveChanges',
+  ClearClipboard: 'clearClipboard',
   PaymentsCode: 'paymentsCode',
   ResetToDefault: 'resetToDefault',
   ClearHistory: 'clearHistory',
@@ -43,9 +43,16 @@ const keys = {
   SignVerify: 'signVerify',
   ExportPrivateKey: 'exportPrivateKey',
   PasteFromClipboard: 'pasteFromClipboard',
-};
+  Hide: 'hide',
+  SortASC: 'sortASC',
+  SortDESC: 'sortDESC',
+  SortHeight: 'sortHeight',
+  SortValue: 'sortValue',
+  SortLabel: 'sortLabel',
+  SortStatus: 'sortStatus',
+} as const;
 
-const icons: { [key: string]: { iconValue: string } } = {
+const icons = {
   Eye: { iconValue: 'eye' },
   EyeSlash: { iconValue: 'eye.slash' },
   Link: { iconValue: 'link' },
@@ -83,9 +90,13 @@ const icons: { [key: string]: { iconValue: string } } = {
   Signature: { iconValue: 'signature' },
   PasteFromClipboard: { iconValue: 'document.on.clipboard' },
   ImportFile: { iconValue: 'document.viewfinder' },
-};
+  Hide: { iconValue: 'eye.slash' },
+  ClearClipboard: { iconValue: 'clipboard' },
+  SortASC: { iconValue: 'arrow.down.to.line' },
+  SortDESC: { iconValue: 'arrow.up.to.line' },
+} as const;
 
-export const CommonToolTipActions: { [key: string]: Action } = {
+export const CommonToolTipActions = {
   CopyTXID: {
     id: keys.CopyTXID,
     text: loc.transactions.details_copy_txid,
@@ -108,7 +119,7 @@ export const CommonToolTipActions: { [key: string]: Action } = {
   },
   CopyAmount: {
     id: keys.CopyAmount,
-    text: loc.transactions.details_copy_amount,
+    text: loc.transactions.details_copy,
     icon: icons.Clipboard,
   },
   AddRecipient: {
@@ -141,21 +152,26 @@ export const CommonToolTipActions: { [key: string]: Action } = {
     text: loc.transactions.details_balance_hide,
     icon: icons.EyeSlash,
   },
+  Hide: {
+    id: keys.Hide,
+    text: loc.total_balance_view.hide,
+    icon: icons.EyeSlash,
+  },
   ViewInFiat: {
     id: keys.ViewInFiat,
-    text: loc.total_balance_view.view_in_fiat,
+    text: loc.total_balance_view.display_in_fiat,
     icon: icons.ViewInFiat,
     hidden: false,
   },
   ViewInSats: {
     id: keys.ViewInSats,
-    text: loc.total_balance_view.view_in_sats,
+    text: loc.total_balance_view.display_in_sats,
     icon: icons.ViewInBitcoin,
     hidden: false,
   },
   ViewInBitcoin: {
     id: keys.ViewInBitcoin,
-    text: loc.total_balance_view.view_in_bitcoin,
+    text: loc.total_balance_view.display_in_bitcoin,
     icon: icons.ViewInBitcoin,
     hidden: false,
   },
@@ -163,6 +179,7 @@ export const CommonToolTipActions: { [key: string]: Action } = {
     id: keys.Entropy,
     text: loc.wallets.add_entropy_provide,
     icon: icons.Entropy,
+    menuState: false,
   },
   RemoveAllRecipients: {
     id: keys.RemoveAllRecipients,
@@ -302,4 +319,36 @@ export const CommonToolTipActions: { [key: string]: Action } = {
     text: loc.wallets.paste_from_clipboard,
     icon: icons.PasteFromClipboard,
   },
-};
+  ClearClipboard: {
+    id: keys.ClearClipboard,
+    text: loc.wallets.clear_clipboard_on_import,
+    icon: icons.Clipboard,
+    menuState: true,
+  },
+  SortASC: {
+    id: keys.SortASC,
+    text: loc.cc.sort_asc,
+    icon: icons.SortASC,
+  },
+  SortDESC: {
+    id: keys.SortDESC,
+    text: loc.cc.sort_desc,
+    icon: icons.SortDESC,
+  },
+  SortHeight: {
+    id: keys.SortHeight,
+    text: loc.cc.sort_height,
+  },
+  SortValue: {
+    id: keys.SortValue,
+    text: loc.cc.sort_value,
+  },
+  SortLabel: {
+    id: keys.SortLabel,
+    text: loc.cc.sort_label,
+  },
+  SortStatus: {
+    id: keys.SortStatus,
+    text: loc.cc.sort_status,
+  },
+} as const;

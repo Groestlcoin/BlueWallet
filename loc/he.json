@@ -448,7 +448,7 @@
     "list_empty_txs2_lightning": "\nלהתחלת שימוש לחצו על \"ניהול כספים\" ומלאו את היתרה שלכם.",
     "list_latest_transaction": "פעולה אחרונה",
     "list_long_choose": "בחר תמונה",
-    "paste_from_clipboard": "הדבקה מלוח",
+    "paste_from_clipboard": "הדבק",
     "import_file": "יבוא קובץ",
     "list_long_scan": "סריקת קוד QR",
     "list_title": "ארנקים",
@@ -471,9 +471,9 @@
     "more_info": "מידע נוסף"
   },
   "total_balance_view": {
-    "view_in_bitcoin": "הצגה גרוסטלקוין",
-    "view_in_sats": "gro הצגה",
-    "view_in_fiat": "הצגה ב- {currency}",
+    "display_in_bitcoin": "הצגה גרוסטלקוין",
+    "display_in_sats": "gro הצגה",
+    "display_in_fiat": "הצגה ב- {currency}",
     "title": "יתרה כוללת",
     "explanation": "הצגת המאזן הכולל של כל הארנקים שלך במסך הכללי."
   },

@@ -31,9 +31,16 @@ export type AddWalletStackParamList = {
     importText: string;
     password: string | undefined;
   };
-  PleaseBackup: undefined;
-  PleaseBackupLNDHub: undefined;
-  ProvideEntropy: undefined;
+  PleaseBackup: {
+    walletID: string;
+  };
+  PleaseBackupLNDHub: {
+    walletID: string;
+  };
+  ProvideEntropy: {
+    onGenerated: (entropy: Buffer) => void;
+    words: number;
+  };
   WalletsAddMultisig: {
     walletLabel: string;
   };
@@ -60,7 +67,11 @@ const AddWalletStack = () => {
           title: loc.wallets.add_title,
         })(theme)}
       />
-      <Stack.Screen name="ImportCustomDerivationPath" component={ImportCustomDerivationPathComponent} />
+      <Stack.Screen
+        name="ImportCustomDerivationPath"
+        component={ImportCustomDerivationPathComponent}
+        options={navigationStyle({ statusBarStyle: 'light', title: loc.wallets.import_derivation_title })(theme)}
+      />
       <Stack.Screen
         name="ImportWallet"
         component={ImportWalletComponent}

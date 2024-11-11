@@ -452,6 +452,7 @@
     "list_empty_txs2_lightning": "\nДля начала использования нажмите на 'Управление средствами' и пополните баланс.",
     "list_latest_transaction": "Последняя транзакция",
     "list_long_choose": "Выбрать фото",
+    "paste_from_clipboard": "Вставить",
     "import_file": "Импортировать файл",
     "list_long_scan": "Сканировать QR-код",
     "list_title": "Кошельки",
@@ -474,9 +475,9 @@
     "more_info": "Подробнее"
   },
   "total_balance_view": {
-    "view_in_bitcoin": "Показать в Groestlcoin",
-    "view_in_sats": "Показать в gro",
-    "view_in_fiat": "Показать в {currency}",
+    "display_in_bitcoin": "Показать в Groestlcoin",
+    "display_in_sats": "Показать в gro",
+    "display_in_fiat": "Показать в {currency}",
     "title": "Общий баланс",
     "explanation": "Просмотр общего баланса всех ваших кошельков на обзорном экране."
   },

@@ -441,6 +441,7 @@
     "list_empty_txs2_lightning": "\nPara começar a usar clique em \"administrar fundos\" e recarregue o seu saldo.",
     "list_latest_transaction": "Transação mais recente",
     "list_long_choose": "Escolher foto",
+    "paste_from_clipboard": "Colar",
     "import_file": "Importar arquivo",
     "list_long_scan": "Leia o código QR",
     "list_title": "Carteiras",
@@ -463,9 +464,9 @@
     "more_info": "Mais informações"
   },
   "total_balance_view": {
-    "view_in_bitcoin": "Ver em Groestlcoin",
-    "view_in_sats": "Ver em gros",
-    "view_in_fiat": "Ver em {currency}",
+    "display_in_bitcoin": "Ver em Groestlcoin",
+    "display_in_sats": "Ver em gros",
+    "display_in_fiat": "Ver em {currency}",
     "title": "Saldo total",
     "explanation": "Veja o saldo total de todas as suas carteiras na tela pricinpal."
   },
