@@ -14,7 +14,7 @@ import { Chain } from '../models/bitcoinUnits';
 import { FiatUnit } from '../models/fiatUnit';
 import { useSettings } from '../hooks/context/useSettings';
 import { useStorage } from '../hooks/context/useStorage';
-import { isNotificationsEnabled, majorTomToGroundControl } from '../blue_modules/notifications';
+// import { isNotificationsEnabled, majorTomToGroundControl } from '../blue_modules/notifications';
 
 interface Message {
   request?: string;
@@ -156,7 +156,7 @@ export function useWatchConnectivity() {
             const invoiceRequest = await wallet.addInvoice(amount, description);
             if (await isNotificationsEnabled()) {
               const decoded = await wallet.decodeInvoice(invoiceRequest);
-              majorTomToGroundControl([], [decoded.payment_hash], []);
+              // majorTomToGroundControl([], [decoded.payment_hash], []);
               return invoiceRequest;
             }
             return invoiceRequest;

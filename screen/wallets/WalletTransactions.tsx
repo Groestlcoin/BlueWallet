@@ -502,7 +502,7 @@ const WalletTransactions: React.FC<WalletTransactionsProps> = ({ route }) => {
         <HandOffComponent
           title={wallet.getLabel()}
           type={HandOffActivityType.Xpub}
-          url={`https://www.blockonomics.co/#/search?q=${wallet.getXpub()}`}
+          url={`https://blockbook.groestlcoin.org/#/search?q=${wallet.getXpub()}`}
         />
       ) : null}
     </View>
