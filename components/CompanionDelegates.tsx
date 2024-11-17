@@ -1,13 +1,20 @@
 import 'react-native-gesture-handler'; // should be on top
 
 import { CommonActions } from '@react-navigation/native';
-import React, { lazy, Suspense, useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { AppState, AppStateStatus, Linking } from 'react-native';
 import A from '../blue_modules/analytics';
 import { getClipboardContent } from '../blue_modules/clipboard';
 import { updateExchangeRate } from '../blue_modules/currency';
 import triggerHapticFeedback, { HapticFeedbackTypes } from '../blue_modules/hapticFeedback';
-// import Notifications from '../blue_modules/notifications';
+// import {
+//  clearStoredNotifications,
+//  getDeliveredNotifications,
+//  getStoredNotifications,
+//  initializeNotifications,
+//  removeAllDeliveredNotifications,
+//  setApplicationIconBadgeNumber,
+//} from '../blue_modules/notifications';
 import { LightningCustodianWallet } from '../class';
 import DeeplinkSchemaMatch from '../class/deeplink-schema-match';
 import loc from '../loc';
@@ -18,12 +25,10 @@ import { useStorage } from '../hooks/context/useStorage';
 import RNQRGenerator from 'rn-qr-generator';
 import presentAlert from './Alert';
 import useMenuElements from '../hooks/useMenuElements';
-import { useSettings } from '../hooks/context/useSettings';
 import useWidgetCommunication from '../hooks/useWidgetCommunication';
 import useWatchConnectivity from '../hooks/useWatchConnectivity';
-
-const DeviceQuickActions = lazy(() => import('../components/DeviceQuickActions'));
-const HandOffComponentListener = lazy(() => import('../components/HandOffComponentListener'));
+import useDeviceQuickActions from '../hooks/useDeviceQuickActions';
+import useHandoffListener from '../hooks/useHandoffListener';
 
 const ClipboardContentType = Object.freeze({
   BITCOIN: 'GROESTLCOIN',
@@ -33,80 +38,140 @@ const ClipboardContentType = Object.freeze({
 const CompanionDelegates = () => {
   const { wallets, addWallet, saveToDisk, fetchAndSaveWalletTransactions, refreshAllWalletTransactions, setSharedCosigner } = useStorage();
   const appState = useRef<AppStateStatus>(AppState.currentState);
-  const { isHandOffUseEnabled, isQuickActionsEnabled } = useSettings();
   const clipboardContent = useRef<undefined | string>();
 
   useWatchConnectivity();
-
   useWidgetCommunication();
   useMenuElements();
+  useDeviceQuickActions();
+  useHandoffListener();
 
   const processPushNotifications = useCallback(async () => {
     await new Promise(resolve => setTimeout(resolve, 200));
-    // @ts-ignore: Notifications type is not defined
-    const notifications2process = await Notifications.getStoredNotifications();
-    // @ts-ignore: Notifications type is not defined
-    await Notifications.clearStoredNotifications();
-    // @ts-ignore: Notifications type is not defined
-    Notifications.setApplicationIconBadgeNumber(0);
-    // @ts-ignore: Notifications type is not defined
-    const deliveredNotifications = await Notifications.getDeliveredNotifications();
-    // @ts-ignore: Notifications type is not defined
-    setTimeout(() => Notifications.removeAllDeliveredNotifications(), 5000);
+    try {
+      const notifications2process = await getStoredNotifications();
+      await clearStoredNotifications();
+      setApplicationIconBadgeNumber(0);
 
-    for (const payload of notifications2process) {
-      const wasTapped = payload.foreground === false || (payload.foreground === true && payload.userInteraction);
+      const deliveredNotifications = await getDeliveredNotifications();
+      setTimeout(async () => {
+        try {
+          removeAllDeliveredNotifications();
+        } catch (error) {
+          console.error('Failed to remove delivered notifications:', error);
+        }
+      }, 5000);
 
-      console.log('processing push notification:', payload);
-      let wallet;
-      switch (+payload.type) {
-        case 2:
-        case 3:
-          wallet = wallets.find(w => w.weOwnAddress(payload.address));
-          break;
-        case 1:
-        case 4:
-          wallet = wallets.find(w => w.weOwnTransaction(payload.txid || payload.hash));
-          break;
-      }
+      // Process notifications
+      for (const payload of notifications2process) {
+        const wasTapped = payload.foreground === false || (payload.foreground === true && payload.userInteraction);
 
-      if (wallet) {
-        const walletID = wallet.getID();
-        fetchAndSaveWalletTransactions(walletID);
-        if (wasTapped) {
-          if (payload.type !== 3 || wallet.chain === Chain.OFFCHAIN) {
-            navigationRef.dispatch(
-              CommonActions.navigate({
-                name: 'WalletTransactions',
+        console.log('processing push notification:', payload);
+        let wallet;
+        switch (+payload.type) {
+          case 2:
+          case 3:
+            wallet = wallets.find(w => w.weOwnAddress(payload.address));
+            break;
+          case 1:
+          case 4:
+            wallet = wallets.find(w => w.weOwnTransaction(payload.txid || payload.hash));
+            break;
+        }
+
+        if (wallet) {
+          const walletID = wallet.getID();
+          fetchAndSaveWalletTransactions(walletID);
+          if (wasTapped) {
+            if (payload.type !== 3 || wallet.chain === Chain.OFFCHAIN) {
+              navigationRef.dispatch(
+                CommonActions.navigate({
+                  name: 'WalletTransactions',
+                  params: {
+                    walletID,
+                    walletType: wallet.type,
+                  },
+                }),
+              );
+            } else {
+              navigationRef.navigate('ReceiveDetailsRoot', {
+                screen: 'ReceiveDetails',
                 params: {
                   walletID,
-                  walletType: wallet.type,
+                  address: payload.address,
                 },
-              }),
-            );
-          } else {
-            navigationRef.navigate('ReceiveDetailsRoot', {
-              screen: 'ReceiveDetails',
-              params: {
-                walletID,
-                address: payload.address,
-              },
-            });
+              });
+            }
+
+            return true;
+          }
+        } else {
+          console.log('could not find wallet while processing push notification, NOP');
+        }
+      }
+
+      if (deliveredNotifications.length > 0) {
+        for (const payload of deliveredNotifications) {
+          const wasTapped = payload.foreground === false || (payload.foreground === true && payload.userInteraction);
+
+          console.log('processing push notification:', payload);
+          let wallet;
+          switch (+payload.type) {
+            case 2:
+            case 3:
+              wallet = wallets.find(w => w.weOwnAddress(payload.address));
+              break;
+            case 1:
+            case 4:
+              wallet = wallets.find(w => w.weOwnTransaction(payload.txid || payload.hash));
+              break;
           }
 
-          return true;
+          if (wallet) {
+            const walletID = wallet.getID();
+            fetchAndSaveWalletTransactions(walletID);
+            if (wasTapped) {
+              if (payload.type !== 3 || wallet.chain === Chain.OFFCHAIN) {
+                navigationRef.dispatch(
+                  CommonActions.navigate({
+                    name: 'WalletTransactions',
+                    params: {
+                      walletID,
+                      walletType: wallet.type,
+                    },
+                  }),
+                );
+              } else {
+                navigationRef.navigate('ReceiveDetailsRoot', {
+                  screen: 'ReceiveDetails',
+                  params: {
+                    walletID,
+                    address: payload.address,
+                  },
+                });
+              }
+
+              return true;
+            }
+          } else {
+            console.log('could not find wallet while processing push notification, NOP');
+          }
         }
-      } else {
-        console.log('could not find wallet while processing push notification, NOP');
       }
-    }
 
-    if (deliveredNotifications.length > 0) {
-      refreshAllWalletTransactions();
+      if (deliveredNotifications.length > 0) {
+        refreshAllWalletTransactions();
+      }
+    } catch (error) {
+      console.error('Failed to process push notifications:', error);
     }
-
     return false;
   }, [fetchAndSaveWalletTransactions, refreshAllWalletTransactions, wallets]);
+
+  useEffect(() => {
+    initializeNotifications(processPushNotifications);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleOpenURL = useCallback(
     async (event: { url: string }): Promise<void> => {
@@ -245,15 +310,7 @@ const CompanionDelegates = () => {
     };
   }, [addListeners]);
 
-  return (
-    <>
-      <Notifications onProcessNotifications={processPushNotifications} />
-      <Suspense fallback={null}>
-        {isQuickActionsEnabled && <DeviceQuickActions />}
-        {isHandOffUseEnabled && <HandOffComponentListener />}
-      </Suspense>
-    </>
-  );
+  return null;
 };
 
 export default CompanionDelegates;
