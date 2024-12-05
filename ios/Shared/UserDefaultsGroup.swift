@@ -27,42 +27,41 @@ let DefaultElectrumPeers = [
 ] + hardcodedPeers
 
 class UserDefaultsGroup {
-  static private let suite = UserDefaults(suiteName: UserDefaultsGroupKey.GroupName.rawValue)
+    static private let suite = UserDefaults(suiteName: UserDefaultsGroupKey.GroupName.rawValue)
 
-  static func getElectrumSettings() -> UserDefaultsElectrumSettings {
-    guard let electrumSettingsHost = suite?.string(forKey: UserDefaultsGroupKey.ElectrumSettingsHost.rawValue) else {
-      return DefaultElectrumPeers.randomElement()!
+    static func getElectrumSettings() -> UserDefaultsElectrumSettings {
+        guard let electrumSettingsHost = suite?.string(forKey: UserDefaultsGroupKey.ElectrumSettingsHost.rawValue) else {
+            return DefaultElectrumPeers.randomElement() ?? UserDefaultsElectrumSettings()
+        }
+
+        let electrumSettingsTCPPort = suite?.integer(forKey: UserDefaultsGroupKey.ElectrumSettingsTCPPort.rawValue) ?? 50001
+        let electrumSettingsSSLPort = suite?.integer(forKey: UserDefaultsGroupKey.ElectrumSettingsSSLPort.rawValue) ?? 50002
+
+        let host = electrumSettingsHost
+        let sslPort = UInt16(electrumSettingsSSLPort)
+        let port = UInt16(electrumSettingsTCPPort)
+
+        return UserDefaultsElectrumSettings(host: host, port: port, sslPort: sslPort)
     }
 
-    let electrumSettingsTCPPort = suite?.value(forKey: UserDefaultsGroupKey.ElectrumSettingsTCPPort.rawValue) ?? 50001
-    let electrumSettingsSSLPort = suite?.value(forKey: UserDefaultsGroupKey.ElectrumSettingsSSLPort.rawValue) ?? 50002
+    static func getAllWalletsBalance() -> Double {
+        guard let allWalletsBalance = suite?.string(forKey: UserDefaultsGroupKey.AllWalletsBalance.rawValue) else {
+            return 0
+        }
 
-    let host = electrumSettingsHost
-    let sslPort = electrumSettingsSSLPort
-    let port = electrumSettingsTCPPort
-
-    return UserDefaultsElectrumSettings(host: host, port: port as! UInt16, sslPort: sslPort as! UInt16)
-  }
-
-  static func getAllWalletsBalance() -> Double {
-    guard let allWalletsBalance = suite?.string(forKey: UserDefaultsGroupKey.AllWalletsBalance.rawValue) else {
-      return 0
+        return Double(allWalletsBalance) ?? 0
     }
 
-    return Double(allWalletsBalance) ?? 0
-  }
+    // Int: EPOCH value, Bool: Latest transaction is unconfirmed
+    static func getAllWalletsLatestTransactionTime() -> LatestTransaction {
+        guard let allWalletsTransactionTime = suite?.string(forKey: UserDefaultsGroupKey.AllWalletsLatestTransactionTime.rawValue) else {
+            return LatestTransaction(isUnconfirmed: false, epochValue: 0)
+        }
 
-  // Int: EPOCH value, Bool: Latest transaction is unconfirmed
-  static func getAllWalletsLatestTransactionTime() -> LatestTransaction {
-    guard let allWalletsTransactionTime = suite?.string(forKey: UserDefaultsGroupKey.AllWalletsLatestTransactionTime.rawValue) else {
-      return LatestTransaction(isUnconfirmed: false, epochValue: 0)
+        if allWalletsTransactionTime == UserDefaultsGroupKey.LatestTransactionIsUnconfirmed.rawValue {
+            return LatestTransaction(isUnconfirmed: true, epochValue: 0)
+        } else {
+            return LatestTransaction(isUnconfirmed: false, epochValue: Int(allWalletsTransactionTime) ?? 0)
+        }
     }
-
-    if allWalletsTransactionTime == UserDefaultsGroupKey.LatestTransactionIsUnconfirmed.rawValue {
-      return LatestTransaction(isUnconfirmed: true, epochValue: 0)
-    } else {
-      return LatestTransaction(isUnconfirmed: false, epochValue: Int(allWalletsTransactionTime))
-    }
-  }
-
 }
