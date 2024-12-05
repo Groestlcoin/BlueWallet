@@ -222,7 +222,7 @@ const TransactionStatus: React.FC<TransactionStatusProps> = ({ transaction, txid
         const transactions = await BlueElectrum.multiGetTransactionByTxid([hash], true, 10);
         const txFromElectrum = transactions[hash];
         if (!txFromElectrum) {
-          console.error(`Transaction from Electrum with hash ${hash} not found.`);
+          console.error(`Transaction from Electrum-GRS with hash ${hash} not found.`);
           return;
         }
 

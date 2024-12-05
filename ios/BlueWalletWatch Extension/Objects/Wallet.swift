@@ -14,7 +14,7 @@ struct Wallet: Codable, Identifiable, Equatable {
     let xpub: String
     let hideBalance: Bool
     let paymentCode: String?
-        
+
     /// Initializes a new Wallet instance.
     /// - Parameters:
     ///   - id: Unique identifier for the wallet. Defaults to a new UUID.
@@ -46,10 +46,10 @@ extension Wallet {
     static var mock: Wallet {
         Wallet(
             label: "Mock Wallet",
-            balance: "1.2345 BTC",
+            balance: "1.2345 GRS",
             type: .hdSegwitBech32Wallet,
             preferredBalanceUnit: .sats,
-            receiveAddress: "bc1qmockaddressxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+            receiveAddress: "grs1qmockaddressxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
             transactions: Transaction.mockTransactions, // Includes multiple transactions
             xpub: "xpub6CUGRUonZSQ4TWtTMmzXdrXDtypWKiKp...",
             hideBalance: false,

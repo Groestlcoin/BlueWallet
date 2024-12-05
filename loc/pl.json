@@ -448,7 +448,7 @@
     "import_discovery_subtitle": "Wybierz odnaleziony portfel",
     "import_discovery_derivation": "Użyj niestandardowej ścieżki derywacji",
     "import_discovery_no_wallets": "Nie odnaleziono portfeli.",
-    "import_discovery_offline": "BlueWallet jest obecnie w trybie offline. W tym trybie nie można zweryfikować istnienia portfela, więc musisz wybrać odpowiedni ręcznie",
+    "import_discovery_offline": "GRS BlueWallet jest obecnie w trybie offline. W tym trybie nie można zweryfikować istnienia portfela, więc musisz wybrać odpowiedni ręcznie",
     "import_derivation_found": "Znaleziono",
     "import_derivation_found_not": "Nie znaleziono",
     "import_derivation_loading": "Ładowanie...",

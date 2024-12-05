@@ -54,10 +54,10 @@ struct CompactPriceView_Previews: PreviewProvider {
             .ignoresSafeArea()
 
             CompactPriceView(
-                price: "$50,000",
+                price: "$0,50",
                 lastUpdated: "Last updated: Oct 10, 2023",
                 code: "BTC",
-                dataSource: "Data source: CoinDesk"
+                dataSource: "Data source: CoinGecko"
             )
         }
     }
