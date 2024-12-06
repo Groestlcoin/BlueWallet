@@ -6,7 +6,7 @@
 //  Copyright © 2024 BlueWallet. All rights reserved.
 //
 
-import SwiftUICore
+import CoreSwiftUI
 
 
 @available(iOS 16.0, *)
