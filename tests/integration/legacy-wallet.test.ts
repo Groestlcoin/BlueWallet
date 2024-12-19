@@ -69,31 +69,31 @@ describe('LegacyWallet', function () {
       assert.ok(tx.confirmations! > 0);
     }
   });
-/*
-  it.each([
+
+  // poor-mans tests with different params, since it works better with our DIY tests retrier
+  const cases = [
     // Transaction with missing address output https://www.blockchain.com/btc/tx/d45818ae11a584357f7b74da26012d2becf4ef064db015a45bdfcd9cb438929d
     ['addresses for vout missing', 'FbThBimw1krwL3QWf6XEk2Xen6NigyzGBT'],
     // ['txdatas were coming back null from BlueElectrum because of high batchsize', '34xp4vRoCGJym3xR7yCVPFHoCNxv4Twseo'],
     // skipped because its slow and flaky if being run in pack with other electrum tests. uncomment and run single
     // if you need to debug huge electrum batches
-  ])(
-    'can fetch TXs when %s',
-    async (useCase, address) => {
-      const w = new LegacyWallet();
-      w._address = address;
-      await w.fetchTransactions();
+  ];
 
-      assert.ok(w.getTransactions().length > 0);
-      for (const tx of w.getTransactions()) {
-        assert.ok(tx.hash);
-        assert.ok(tx.value !== undefined);
-        assert.ok(tx.received);
-        assert.ok(tx.confirmations! > 1);
-      }
-    },
-    240000,
-  );
-  */
+  const caseRunner = async (address: string) => {
+    const w = new LegacyWallet();
+    w._address = address;
+    await w.fetchTransactions();
+
+    assert.ok(w.getTransactions().length > 0);
+    for (const tx of w.getTransactions()) {
+      assert.ok(tx.hash);
+      assert.ok(tx.value);
+      assert.ok(tx.received);
+      assert.ok(tx.confirmations! > 1);
+    }
+  };
+
+  it('can fetch TXs when ' + cases[0][0], async () => await caseRunner(cases[0][1]), 240000);
 
   it('can fetch UTXO', async () => {
     const w = new LegacyWallet();

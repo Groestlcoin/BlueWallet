@@ -25,13 +25,7 @@ describe('Watch only wallet', () => {
   });
 
   it.skip('can fetch tx', async () => {
-    let w = new WatchOnlyWallet();
-    w.setSecret('FXbmGth3JXKH3KpAsze62DJWXGFtAhpafc');
-    await w.fetchTransactions();
-    assert.ok(w.getTransactions().length >= 215, w.getTransactions().length);
-    // should be 233 but electrum-grs server cant return huge transactions >.<
-
-    w = new WatchOnlyWallet();
+    const w = new WatchOnlyWallet();
     w.setSecret('Fie2GtRuNdoszcinPVKtMbkK9nVN3D82dt');
     await w.fetchTransactions();
     assert.strictEqual(w.getTransactions().length, 2);
