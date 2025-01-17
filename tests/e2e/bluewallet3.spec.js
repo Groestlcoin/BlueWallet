@@ -48,7 +48,7 @@ describe('BlueWallet UI Tests - import Watch-only wallet (zpub)', () => {
 
     await expect(element(by.id('BitcoinAddressQRCodeContainer'))).toBeVisible();
 
-    await expect(element(by.text('groestlcoin:grs1q5vzs7ea3z5e2wt53mp97mfy927eu75l7tdf0nq?amount=1&label=Test'))).toBeVisible();
+    await expect(element(by.text('groestlcoin:GRS1QC8WUN6LF9VCAJPDDTGDPD2PDRP0KWP29J6UPGV?amount=1&label=Test'))).toBeVisible();
     await device.pressBack();
     await element(by.id('SendButton')).tap();
     await element(by.text('OK')).tap();

@@ -86,15 +86,14 @@ describe('BlueWallet UI Tests - no wallets', () => {
     // change electrum-grs server to electrum.blockstream.info and revert it back
     await element(by.id('ElectrumSettings')).tap();
     await element(by.id('ElectrumSettingsScrollView')).swipe('up', 'fast', 1); // in case emu screen is small and it doesnt fit
-    await element(by.id('HostInput')).replaceText('electrum.blockstream.info\n');
+    await element(by.id('HostInput')).replaceText('electrum2.groestlcoin.org\n');
     await element(by.id('PortInput')).replaceText('50001\n');
     await element(by.id('ElectrumSettingsScrollView')).swipe('up', 'fast', 1); // in case emu screen is small and it doesnt fit
     await element(by.id('Save')).tap();
     await sup('OK');
     await element(by.text('OK')).tap();
     await element(by.id('HeaderMenuButton')).tap();
-    await element(by.text('Preferred Server')).tap();
-    await element(by.text('electrum1.groestlcoin.org (50001)')).tap();
+    await element(by.text('Reset to default')).tap();
     await sup('OK');
     await element(by.text('OK')).tap();
     await sup('OK');
