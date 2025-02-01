@@ -296,7 +296,7 @@
     "PYG": {
         "endPointKey": "PYG",
         "locale": "es-PY",
-        "source": "CoinDesk",
+        "source": "CoinGecko",
         "symbol": "₲",
         "country": "Paraguay (Paraguayan Guarani)"
     },
