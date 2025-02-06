@@ -1,7 +1,6 @@
 import bip21, { TOptions } from 'bip21grs';
 import * as bitcoin from 'groestlcoinjs-lib';
 import URL from 'url';
-
 import { readFileOutsideSandbox } from '../blue_modules/fs';
 import { Chain } from '../models/bitcoinUnits';
 import { WatchOnlyWallet } from './';
