@@ -85,6 +85,9 @@ class MarketAPI {
      private static func fetchData(url: URL, source: String, endPointKey: String, retries: Int = 3) async throws -> WidgetDataStore? {
          do {
              let (data, _) = try await URLSession.shared.data(from: url)
+             if source == "BNR" {
+                 return try await handleBNRData(data: data)
+             } else {
                  return try handleDefaultData(data: data, source: source, endPointKey: endPointKey)
              }
          } catch {
