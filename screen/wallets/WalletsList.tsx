@@ -98,7 +98,7 @@ const WalletsList: React.FC = () => {
   const { isLargeScreen } = useIsLargeScreen();
   const walletsCarousel = useRef<any>();
   const currentWalletIndex = useRef<number>(0);
-  const { setReloadTransactionsMenuActionFunction } = useMenuElements();
+  const { setReloadTransactionsMenuActionFunction, clearReloadTransactionsMenuAction } = useMenuElements();
   const { wallets, getTransactions, getBalance, refreshAllWalletTransactions, setSelectedWalletID } = useStorage();
   const { isTotalBalanceEnabled, isElectrumDisabled } = useSettings();
   const { width } = useWindowDimensions();
@@ -122,27 +122,32 @@ const WalletsList: React.FC = () => {
     },
   });
 
-  /**
-   * Forcefully fetches TXs and balance for ALL wallets.
-   * Triggered manually by user on pull-to-refresh.
-   */
-  const refreshTransactions = useCallback(
-    async (showLoadingIndicator = true, showUpdateStatusIndicator = false) => {
-      if (isElectrumDisabled) {
-        dispatch({ type: ActionTypes.SET_LOADING, payload: false });
-        return;
-      }
+  const refreshWallets = useCallback(
+    async (index: number | undefined, showLoadingIndicator = true, showUpdateStatusIndicator = false) => {
+      if (isElectrumDisabled) return;
       dispatch({ type: ActionTypes.SET_LOADING, payload: showLoadingIndicator });
-      refreshAllWalletTransactions(undefined, showUpdateStatusIndicator).finally(() => {
+      try {
+        await refreshAllWalletTransactions(index, showUpdateStatusIndicator);
+      } catch (error) {
+        console.error(error);
+      } finally {
         dispatch({ type: ActionTypes.SET_LOADING, payload: false });
-      });
+      }
     },
     [isElectrumDisabled, refreshAllWalletTransactions],
   );
 
+  /**
+   * Forcefully fetches TXs and balance for ALL wallets.
+   * Triggered manually by user on pull-to-refresh.
+   */
+  const refreshTransactions = useCallback(() => {
+    refreshWallets(undefined, true, false);
+  }, [refreshWallets]);
+
   const onRefresh = useCallback(() => {
     console.debug('WalletsList onRefresh');
-    refreshTransactions(true, false);
+    refreshTransactions();
     // Optimized for Mac option doesn't like RN Refresh component. Menu Elements now handles it for macOS
   }, [refreshTransactions]);
 
@@ -157,25 +162,28 @@ const WalletsList: React.FC = () => {
   useFocusEffect(
     useCallback(() => {
       const task = InteractionManager.runAfterInteractions(() => {
-        setReloadTransactionsMenuActionFunction(() => onRefresh);
+        setReloadTransactionsMenuActionFunction(onRefresh);
         verifyBalance();
         setSelectedWalletID(undefined);
       });
+
       return () => {
         task.cancel();
-        setReloadTransactionsMenuActionFunction(() => {});
+        clearReloadTransactionsMenuAction();
       };
-    }, [onRefresh, setReloadTransactionsMenuActionFunction, verifyBalance, setSelectedWalletID]),
+    }, [onRefresh, setReloadTransactionsMenuActionFunction, clearReloadTransactionsMenuAction, verifyBalance, setSelectedWalletID]),
   );
 
   useEffect(() => {
     // new wallet added
-    if (wallets.length > walletsCount.current) {
-      walletsCarousel.current?.scrollToItem({ item: wallets[walletsCount.current], viewPosition: 0.3 });
-    }
+    if (!isLargeScreen) {
+      if (wallets.length > walletsCount.current) {
+        walletsCarousel.current?.scrollToItem({ item: wallets[walletsCount.current], viewPosition: 0.3 });
+      }
 
-    walletsCount.current = wallets.length;
-  }, [wallets]);
+      walletsCount.current = wallets.length;
+    }
+  }, [isLargeScreen, wallets]);
 
   const onBarScanned = useCallback(
     (value: any) => {
@@ -198,7 +206,7 @@ const WalletsList: React.FC = () => {
   }, [navigation, onBarScanned, route.params?.onBarScanned]);
 
   useEffect(() => {
-    refreshTransactions(false, true);
+    refreshTransactions();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -217,10 +225,6 @@ const WalletsList: React.FC = () => {
     [navigation],
   );
 
-  const setIsLoading = useCallback((value: boolean) => {
-    dispatch({ type: ActionTypes.SET_LOADING, payload: value });
-  }, []);
-
   const onSnapToItem = useCallback(
     (e: { nativeEvent: { contentOffset: any } }) => {
       if (!isFocused) return;
@@ -231,12 +235,12 @@ const WalletsList: React.FC = () => {
       if (currentWalletIndex.current !== index) {
         console.debug('onSnapToItem', wallets.length === index ? 'NewWallet/Importing card' : index);
         if (wallets[index] && (wallets[index].timeToRefreshBalance() || wallets[index].timeToRefreshTransaction())) {
-          refreshAllWalletTransactions(index, false).finally(() => setIsLoading(false));
+          refreshWallets(index, false, false);
         }
         currentWalletIndex.current = index;
       }
     },
-    [isFocused, refreshAllWalletTransactions, setIsLoading, wallets, width],
+    [isFocused, refreshWallets, wallets, width],
   );
 
   const renderListHeaderComponent = useCallback(() => {
@@ -256,7 +260,7 @@ const WalletsList: React.FC = () => {
   const renderTransactionListsRow = useCallback(
     (item: ExtendedTransaction) => (
       <View style={styles.transaction}>
-        <TransactionListItem item={item} itemPriceUnit={item.walletPreferredBalanceUnit} walletID={item.walletID} />
+        <TransactionListItem key={item.hash} item={item} itemPriceUnit={item.walletPreferredBalanceUnit} walletID={item.walletID} />
       </View>
     ),
     [],
@@ -354,9 +358,9 @@ const WalletsList: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [scanImage, wallets.length]);
 
-  const sectionListKeyExtractor = (item: any, index: any) => {
+  const sectionListKeyExtractor = useCallback((item: any, index: any) => {
     return `${item}${index}}`;
-  };
+  }, []);
 
   const onScanButtonPressed = useCallback(() => {
     navigation.navigate('ScanQRCode', {
@@ -417,6 +421,15 @@ const WalletsList: React.FC = () => {
     { key: WalletsListSections.TRANSACTIONS, data: dataSource },
   ];
 
+  const getItemLayout = useCallback(
+    (data: any, index: number) => ({
+      length: 80, // Approximate height of each item
+      offset: 80 * index,
+      index,
+    }),
+    [],
+  );
+
   return (
     <View style={styles.root}>
       <View style={[styles.walletsListWrapper, stylesHook.walletsListWrapper]}>
@@ -435,6 +448,7 @@ const WalletsList: React.FC = () => {
           windowSize={21}
           maxToRenderPerBatch={10}
           updateCellsBatchingPeriod={50}
+          getItemLayout={getItemLayout}
         />
         {renderScanButton()}
       </View>

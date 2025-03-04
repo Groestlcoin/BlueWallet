@@ -12,23 +12,18 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
-import triggerHapticFeedback, { HapticFeedbackTypes } from '../../blue_modules/hapticFeedback';
+import { useFocusEffect, usePreventRemove } from '@react-navigation/native';
 import { useTheme } from '../../components/themes';
 import { useExtendedNavigation } from '../../hooks/useExtendedNavigation';
-import loc, { formatBalanceWithoutSuffix } from '../../loc';
+import loc from '../../loc';
 import { useStorage } from '../../hooks/context/useStorage';
-import useDebounce from '../../hooks/useDebounce';
 import { TTXMetadata } from '../../class';
 import { ExtendedTransaction, LightningTransaction, Transaction, TWallet } from '../../class/wallets/types';
 import useBounceAnimation from '../../hooks/useBounceAnimation';
-import { unlockWithBiometrics, useBiometrics } from '../../hooks/useBiometrics';
-import presentAlert from '../../components/Alert';
-import prompt from '../../helpers/prompt';
 import HeaderRightButton from '../../components/HeaderRightButton';
 import { useSettings } from '../../hooks/context/useSettings';
 import DragList, { DragListRenderItemInfo } from 'react-native-draglist';
-import { BitcoinUnit } from '../../models/bitcoinUnits';
+import useDebounce from '../../hooks/useDebounce';
 
 const ManageWalletsListItem = lazy(() => import('../../components/ManageWalletsListItem'));
 
@@ -199,11 +194,8 @@ const ManageWallets: React.FC = () => {
   const walletsRef = useRef<TWallet[]>(deepCopyWallets(storedWallets)); // Create a deep copy of wallets for the DraggableFlatList
   const { navigate, setOptions, goBack } = useExtendedNavigation();
   const [state, dispatch] = useReducer(reducer, initialState);
-  const { isBiometricUseCapableAndEnabled } = useBiometrics();
-  const navigation = useNavigation();
   const debouncedSearchQuery = useDebounce(state.searchQuery, 300);
   const bounceAnim = useBounceAnimation(state.searchQuery);
-  const beforeRemoveListenerRef = useRef<(() => void) | null>(null);
   const stylesHook = {
     root: {
       backgroundColor: colors.elevated,
@@ -231,6 +223,19 @@ const ManageWallets: React.FC = () => {
     }
   }, [debouncedSearchQuery, state.order]);
 
+  const hasUnsavedChanges = useMemo(() => {
+    return JSON.stringify(walletsRef.current) !== JSON.stringify(state.tempOrder.map(item => item.data));
+  }, [state.tempOrder]);
+
+  usePreventRemove(hasUnsavedChanges, async () => {
+    await new Promise<void>(resolve => {
+      Alert.alert(loc._.discard_changes, loc._.discard_changes_explain, [
+        { text: loc._.cancel, style: 'cancel', onPress: () => resolve() },
+        { text: loc._.ok, style: 'default', onPress: () => resolve() },
+      ]);
+    });
+  });
+
   const handleClose = useCallback(() => {
     if (state.searchQuery.length === 0 && !state.isSearchFocused) {
       const newWalletOrder = state.tempOrder
@@ -249,20 +254,12 @@ const ManageWallets: React.FC = () => {
         }
       });
 
-      if (beforeRemoveListenerRef.current) {
-        navigation.removeListener('beforeRemove', beforeRemoveListenerRef.current);
-      }
-
       goBack();
     } else {
       dispatch({ type: SET_SEARCH_QUERY, payload: '' });
       dispatch({ type: SET_IS_SEARCH_FOCUSED, payload: false });
     }
-  }, [goBack, setWalletsWithNewOrder, state.searchQuery, state.isSearchFocused, state.tempOrder, navigation, handleWalletDeletion]);
-
-  const hasUnsavedChanges = useMemo(() => {
-    return JSON.stringify(walletsRef.current) !== JSON.stringify(state.tempOrder.map(item => item.data));
-  }, [state.tempOrder]);
+  }, [goBack, setWalletsWithNewOrder, state.searchQuery, state.isSearchFocused, state.tempOrder, handleWalletDeletion]);
 
   const HeaderLeftButton = useMemo(
     () => (
@@ -304,44 +301,11 @@ const ManageWallets: React.FC = () => {
   useFocusEffect(
     useCallback(() => {
       setIsDrawerShouldHide(true);
-      const beforeRemoveListener = (e: { preventDefault: () => void; data: { action: any } }) => {
-        if (!hasUnsavedChanges) {
-          return;
-        }
-
-        e.preventDefault();
-
-        Alert.alert(loc._.discard_changes, loc._.discard_changes_explain, [
-          { text: loc._.cancel, style: 'cancel', onPress: () => {} },
-          {
-            text: loc._.ok,
-            style: 'default',
-            onPress: () => navigation.dispatch(e.data.action),
-          },
-        ]);
-      };
-
-      // @ts-ignore: fix later
-      beforeRemoveListenerRef.current = beforeRemoveListener;
-
-      navigation.addListener('beforeRemove', beforeRemoveListener);
-
       return () => {
-        if (beforeRemoveListenerRef.current) {
-          navigation.removeListener('beforeRemove', beforeRemoveListenerRef.current);
-        }
         setIsDrawerShouldHide(false);
       };
-    }, [hasUnsavedChanges, navigation, setIsDrawerShouldHide]),
+    }, [setIsDrawerShouldHide]),
   );
-
-  // Ensure the listener is re-added every time there are unsaved changes
-  useEffect(() => {
-    if (beforeRemoveListenerRef.current) {
-      navigation.removeListener('beforeRemove', beforeRemoveListenerRef.current);
-      navigation.addListener('beforeRemove', beforeRemoveListenerRef.current);
-    }
-  }, [hasUnsavedChanges, navigation]);
 
   const renderHighlightedText = useCallback(
     (text: string, query: string) => {
@@ -365,63 +329,14 @@ const ManageWallets: React.FC = () => {
     [bounceAnim],
   );
 
-  const presentWalletHasBalanceAlert = useCallback(async (wallet: TWallet) => {
-    triggerHapticFeedback(HapticFeedbackTypes.NotificationWarning);
-    try {
-      const balance = formatBalanceWithoutSuffix(wallet.getBalance(), BitcoinUnit.SATS, true);
-      const walletBalanceConfirmation = await prompt(
-        loc.wallets.details_delete_wallet,
-        loc.formatString(loc.wallets.details_del_wb_q, { balance }),
-        true,
-        'numeric',
-        true,
-        loc.wallets.details_delete,
-      );
-      const cleanedConfirmation = (walletBalanceConfirmation || '').replace(/[^0-9]/g, '');
-
-      if (Number(cleanedConfirmation) === wallet.getBalance()) {
-        triggerHapticFeedback(HapticFeedbackTypes.NotificationSuccess);
-        LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-        dispatch({ type: REMOVE_WALLET, payload: wallet.getID() });
-      } else {
-        triggerHapticFeedback(HapticFeedbackTypes.NotificationError);
-        presentAlert({ message: loc.wallets.details_del_wb_err });
-      }
-    } catch (_) {}
-  }, []);
-
   const handleDeleteWallet = useCallback(
     async (wallet: TWallet) => {
-      triggerHapticFeedback(HapticFeedbackTypes.NotificationWarning);
-      presentAlert({
-        title: loc.wallets.details_delete_wallet,
-        message: loc.wallets.details_are_you_sure,
-        buttons: [
-          {
-            text: loc.wallets.details_yes_delete,
-            onPress: async () => {
-              const isBiometricsEnabled = await isBiometricUseCapableAndEnabled();
-
-              if (isBiometricsEnabled) {
-                if (!(await unlockWithBiometrics())) {
-                  return;
-                }
-              }
-              if (wallet.getBalance && wallet.getBalance() > 0 && wallet.allowSend && wallet.allowSend()) {
-                presentWalletHasBalanceAlert(wallet);
-              } else {
-                LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-                dispatch({ type: REMOVE_WALLET, payload: wallet.getID() });
-              }
-            },
-            style: 'destructive',
-          },
-          { text: loc._.cancel, onPress: () => {}, style: 'cancel' },
-        ],
-        options: { cancelable: false },
-      });
+      const deletionSucceeded = await handleWalletDeletion(wallet.getID());
+      if (deletionSucceeded) {
+        dispatch({ type: REMOVE_WALLET, payload: wallet.getID() });
+      }
     },
-    [isBiometricUseCapableAndEnabled, presentWalletHasBalanceAlert],
+    [handleWalletDeletion],
   );
 
   const handleToggleHideBalance = useCallback(

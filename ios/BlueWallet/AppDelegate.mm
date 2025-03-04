@@ -6,12 +6,9 @@
 #import "RNQuickActionManager.h"
 #import <UserNotifications/UserNotifications.h>
 #import <RNCPushNotificationIOS.h>
-#import "EventEmitter.h"
-#import "MenuElementsEmitter.h"
 #import <React/RCTRootView.h>
 #import <Bugsnag/Bugsnag.h>
 #import "BlueWallet-Swift.h"
-#import "CustomSegmentedControlManager.h"
 
 @interface AppDelegate() <UNUserNotificationCenterDelegate>
 
@@ -23,8 +20,6 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-  [MenuElementsEmitter sharedInstance];
-  [CustomSegmentedControlManager registerIfNecessary];
   [self clearFilesIfNeeded];
   self.userDefaultsGroup = [[NSUserDefaults alloc] initWithSuiteName:@"group.org.groestlcoin.bluewallet123"];
 
@@ -154,27 +149,42 @@
 - (BOOL)application:(UIApplication *)application continueUserActivity:(nonnull NSUserActivity *)userActivity
  restorationHandler:(nonnull void (^)(NSArray<id<UIUserActivityRestoring>> * _Nullable))restorationHandler
 {
-  NSDictionary *userActivityData = @{@"activityType": userActivity.activityType, @"userInfo": userActivity.userInfo};
+  // Validate userActivity and its type
+  if (!userActivity || !userActivity.activityType) {
+    NSLog(@"[Handoff] Invalid or missing userActivity");
+    return NO;
+  }
+
+  NSDictionary *userActivityData = @{@"activityType": userActivity.activityType ?: @"",
+                                     @"userInfo": userActivity.userInfo ?: @{}};
+
+  // Save activity data to userDefaults for potential later use
   [self.userDefaultsGroup setValue:userActivityData forKey:@"onUserActivityOpen"];
 
-  // Check if the activity type matches the allowed types
+  // Check if the activity type matches one of the allowed types
   if ([userActivity.activityType isEqualToString:@"org.groestlcoin.bluewallet123.receiveonchain"] ||
       [userActivity.activityType isEqualToString:@"org.groestlcoin.bluewallet123.xpub"] ||
       [userActivity.activityType isEqualToString:@"org.groestlcoin.bluewallet123.blockexplorer"]) {
 
-    [EventEmitter.sharedInstance sendUserActivity:userActivityData];
+    if ([EventEmitter.shared respondsToSelector:@selector(sendUserActivity:)]) {
+      [EventEmitter.shared sendUserActivity:userActivityData];
+    } else {
+      NSLog(@"[Handoff] EventEmitter does not implement sendUserActivity:");
+    }
     return YES;
   }
 
-  if (userActivity.activityType == NSUserActivityTypeBrowsingWeb) {
+  // Forward web browsing activities to LinkingManager
+  if ([userActivity.activityType isEqualToString:NSUserActivityTypeBrowsingWeb]) {
     return [RCTLinkingManager application:application
                      continueUserActivity:userActivity
                        restorationHandler:restorationHandler];
   }
 
-  // If activity type does not match any of the specified types, do nothing
+  NSLog(@"[Handoff] Unhandled user activity type: %@", userActivity.activityType);
   return NO;
 }
+
 - (BOOL)application:(UIApplication *)app openURL:(NSURL *)url options:(NSDictionary<UIApplicationOpenURLOptionsKey,id> *)options {
   return [RCTLinkingManager application:app openURL:url options:options];
 }
@@ -195,7 +205,7 @@
 -(void)userNotificationCenter:(UNUserNotificationCenter *)center willPresentNotification:(UNNotification *)notification withCompletionHandler:(void (^)(UNNotificationPresentationOptions options))completionHandler
 {
   NSDictionary *userInfo = notification.request.content.userInfo;
-  completionHandler(UNNotificationPresentationOptionSound | UNNotificationPresentationOptionAlert | UNNotificationPresentationOptionBadge);
+  completionHandler(UNNotificationPresentationOptionSound | UNNotificationPresentationOptionList | UNNotificationPresentationOptionBanner | UNNotificationPresentationOptionBadge);
 }
 
 - (void)buildMenuWithBuilder:(id<UIMenuBuilder>)builder {
@@ -244,25 +254,51 @@
 }
 
 - (void)openSettings:(UIKeyCommand *)keyCommand {
-  [MenuElementsEmitter.sharedInstance openSettings];
+    // Safely access the MenuElementsEmitter
+    MenuElementsEmitter *emitter = [MenuElementsEmitter shared];
+    if (emitter) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [emitter openSettings];
+        });
+    } else {
+        NSLog(@"MenuElementsEmitter not available");
+    }
 }
 
 - (void)addWalletAction:(UIKeyCommand *)keyCommand {
-    // Implement the functionality for adding a wallet
-    [MenuElementsEmitter.sharedInstance addWalletMenuAction];
-    NSLog(@"Add Wallet action performed");
+    // Safely access the MenuElementsEmitter
+    MenuElementsEmitter *emitter = [MenuElementsEmitter shared];
+    if (emitter) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [emitter addWalletMenuAction];
+        });
+    } else {
+        NSLog(@"MenuElementsEmitter not available");
+    }
 }
 
 - (void)importWalletAction:(UIKeyCommand *)keyCommand {
-    // Implement the functionality for adding a wallet
-    [MenuElementsEmitter.sharedInstance importWalletMenuAction];
-    NSLog(@"Import Wallet action performed");
+    // Safely access the MenuElementsEmitter
+    MenuElementsEmitter *emitter = [MenuElementsEmitter shared];
+    if (emitter) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [emitter importWalletMenuAction];
+        });
+    } else {
+        NSLog(@"MenuElementsEmitter not available");
+    }
 }
 
 - (void)reloadTransactionsAction:(UIKeyCommand *)keyCommand {
-    // Implement the functionality for adding a wallet
-  [MenuElementsEmitter.sharedInstance reloadTransactionsMenuAction];
-    NSLog(@"Reload Transactions action performed");
+    // Safely access the MenuElementsEmitter
+    MenuElementsEmitter *emitter = [MenuElementsEmitter shared];
+    if (emitter) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [emitter reloadTransactionsMenuAction];
+        });
+    } else {
+        NSLog(@"MenuElementsEmitter not available");
+    }
 }
 
 - (void)showHelp:(id)sender {

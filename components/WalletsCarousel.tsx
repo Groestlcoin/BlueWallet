@@ -1,4 +1,4 @@
-import React, { forwardRef, useCallback, useImperativeHandle, useRef } from 'react';
+import React, { forwardRef, useCallback, useImperativeHandle, useMemo, useRef } from 'react';
 import {
   Animated,
   FlatList,
@@ -98,8 +98,12 @@ interface WalletCarouselItemProps {
   isSelectedWallet?: boolean;
   customStyle?: ViewStyle;
   horizontal?: boolean;
+  isPlaceHolder?: boolean;
   searchQuery?: string;
   renderHighlightedText?: (text: string, query: string) => JSX.Element;
+  animationsEnabled?: boolean;
+  onPressIn?: () => void;
+  onPressOut?: () => void;
 }
 
 const iStyles = StyleSheet.create({
@@ -161,21 +165,6 @@ const iStyles = StyleSheet.create({
   },
 });
 
-interface WalletCarouselItemProps {
-  item: TWallet;
-  onPress: (item: TWallet) => void;
-  handleLongPress?: () => void;
-  isSelectedWallet?: boolean;
-  customStyle?: ViewStyle;
-  horizontal?: boolean;
-  isPlaceHolder?: boolean;
-  searchQuery?: string;
-  renderHighlightedText?: (text: string, query: string) => JSX.Element;
-  animationsEnabled?: boolean;
-  onPressIn?: () => void;
-  onPressOut?: () => void;
-}
-
 export const WalletCarouselItem: React.FC<WalletCarouselItemProps> = React.memo(
   ({
     item,
@@ -198,34 +187,31 @@ export const WalletCarouselItem: React.FC<WalletCarouselItemProps> = React.memo(
     const itemWidth = width * 0.82 > 375 ? 375 : width * 0.82;
     const { isLargeScreen } = useIsLargeScreen();
 
+    const springConfig = useMemo(() => ({ useNativeDriver: true, tension: 100 }), []);
+    const animateScale = useCallback(
+      (toValue: number, callback?: () => void) => {
+        Animated.spring(scaleValue, { toValue, ...springConfig }).start(callback);
+      },
+      [scaleValue, springConfig],
+    );
+
     const onPressedIn = useCallback(() => {
       if (animationsEnabled) {
-        Animated.spring(scaleValue, {
-          toValue: 0.95,
-          useNativeDriver: true,
-          friction: 3,
-          tension: 100,
-        }).start();
+        animateScale(0.95);
       }
       if (onPressIn) onPressIn();
-    }, [scaleValue, animationsEnabled, onPressIn]);
+    }, [animateScale, animationsEnabled, onPressIn]);
 
     const onPressedOut = useCallback(() => {
       if (animationsEnabled) {
-        Animated.spring(scaleValue, {
-          toValue: 1.0,
-          useNativeDriver: true,
-          friction: 3,
-          tension: 100,
-        }).start();
+        animateScale(1.0);
       }
       if (onPressOut) onPressOut();
-    }, [scaleValue, animationsEnabled, onPressOut]);
+    }, [animateScale, animationsEnabled, onPressOut]);
 
     const handlePress = useCallback(() => {
-      onPressedOut();
       onPress(item);
-    }, [item, onPress, onPressedOut]);
+    }, [item, onPress]);
 
     const opacity = isSelectedWallet === false ? 0.5 : 1.0;
     let image;
@@ -267,6 +253,8 @@ export const WalletCarouselItem: React.FC<WalletCarouselItemProps> = React.memo(
             if (handleLongPress) handleLongPress();
           }}
           onPress={handlePress}
+          delayHoverIn={0}
+          delayHoverOut={0}
         >
           <View style={[iStyles.shadowContainer, { backgroundColor: colors.background, shadowColor: colors.shadowColor }]}>
             <LinearGradient colors={WalletGradient.gradientsFor(item.type)} style={iStyles.grad}>
@@ -362,6 +350,10 @@ const WalletsCarousel = forwardRef<FlatListRefType, WalletsCarouselProps>((props
     renderHighlightedText,
     isFlatList = true,
   } = props;
+
+  const { width } = useWindowDimensions();
+  const itemWidth = React.useMemo(() => (width * 0.82 > 375 ? 375 : width * 0.82), [width]);
+
   const renderItem = useCallback(
     ({ item, index }: ListRenderItemInfo<TWallet>) =>
       item ? (
@@ -379,7 +371,6 @@ const WalletsCarousel = forwardRef<FlatListRefType, WalletsCarouselProps>((props
   );
 
   const flatListRef = useRef<FlatList<any>>(null);
-
   useImperativeHandle(ref, (): any => {
     return {
       scrollToEnd: (params: { animated?: boolean | null | undefined } | undefined) => flatListRef.current?.scrollToEnd(params),
@@ -401,10 +392,8 @@ const WalletsCarousel = forwardRef<FlatListRefType, WalletsCarouselProps>((props
       getNativeScrollRef: () => flatListRef.current?.getNativeScrollRef(),
     };
   }, []);
-
   const onScrollToIndexFailed = (error: { averageItemLength: number; index: number }): void => {
-    console.debug('onScrollToIndexFailed');
-    console.debug(error);
+    console.debug('onScrollToIndexFailed', error);
     flatListRef.current?.scrollToOffset({ offset: error.averageItemLength * error.index, animated: true });
     setTimeout(() => {
       if (data.length !== 0 && flatListRef.current !== null) {
@@ -413,16 +402,16 @@ const WalletsCarousel = forwardRef<FlatListRefType, WalletsCarouselProps>((props
     }, 100);
   };
 
-  const { width } = useWindowDimensions();
   const sliderHeight = 195;
-  const itemWidth = width * 0.82 > 375 ? 375 : width * 0.82;
+
+  const keyExtractor = useCallback((item: TWallet, index: number) => (item?.getID ? item.getID() : index.toString()), []);
 
   return isFlatList ? (
     <FlatList
       ref={flatListRef}
       renderItem={renderItem}
       extraData={data}
-      keyExtractor={(_, index) => index.toString()}
+      keyExtractor={keyExtractor}
       showsVerticalScrollIndicator={false}
       pagingEnabled={horizontal}
       disableIntervalMomentum={horizontal}
@@ -433,6 +422,7 @@ const WalletsCarousel = forwardRef<FlatListRefType, WalletsCarouselProps>((props
       showsHorizontalScrollIndicator={false}
       initialNumToRender={10}
       scrollEnabled={scrollEnabled}
+      keyboardShouldPersistTaps="handled"
       ListHeaderComponent={ListHeaderComponent}
       style={{ minHeight: sliderHeight + 12 }}
       onScrollToIndexFailed={onScrollToIndexFailed}

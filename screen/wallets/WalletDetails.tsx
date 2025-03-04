@@ -37,7 +37,7 @@ import { useExtendedNavigation } from '../../hooks/useExtendedNavigation';
 import loc, { formatBalanceWithoutSuffix } from '../../loc';
 import { BitcoinUnit, Chain } from '../../models/bitcoinUnits';
 import { useStorage } from '../../hooks/context/useStorage';
-import { useFocusEffect, useRoute, RouteProp } from '@react-navigation/native';
+import { useFocusEffect, useRoute, RouteProp, usePreventRemove } from '@react-navigation/native';
 import { LightningTransaction, Transaction, TWallet } from '../../class/wallets/types';
 import { DetailViewStackParamList } from '../../navigation/DetailViewStackParamList';
 import HeaderMenuButton from '../../components/HeaderMenuButton';
@@ -66,7 +66,7 @@ const WalletDetails: React.FC = () => {
   const [hideTransactionsInWalletsList, setHideTransactionsInWalletsList] = useState<boolean>(
     wallet.getHideTransactionsInWalletsList ? !wallet.getHideTransactionsInWalletsList() : true,
   );
-  const { setOptions, navigate, addListener } = useExtendedNavigation();
+  const { setOptions, navigate } = useExtendedNavigation();
   const { colors } = useTheme();
   const [walletName, setWalletName] = useState<string>(wallet.getLabel());
 
@@ -87,10 +87,14 @@ const WalletDetails: React.FC = () => {
   }, [wallet]);
   const [isMasterFingerPrintVisible, setIsMasterFingerPrintVisible] = useState<boolean>(false);
 
-  const navigateToOverviewAndDeleteWallet = useCallback(() => {
+  const navigateToOverviewAndDeleteWallet = useCallback(async () => {
     setIsLoading(true);
-    handleWalletDeletion(wallet.getID());
-    popToTop();
+    const deletionSucceeded = await handleWalletDeletion(wallet.getID());
+    if (deletionSucceeded) {
+      popToTop();
+    } else {
+      setIsLoading(false);
+    }
   }, [handleWalletDeletion, wallet]);
 
   const presentWalletHasBalanceAlert = useCallback(async () => {
@@ -129,10 +133,10 @@ const WalletDetails: React.FC = () => {
           text: loc.wallets.details_yes_delete,
           onPress: async () => {
             const isBiometricsEnabled = await isBiometricUseCapableAndEnabled();
-
             if (isBiometricsEnabled) {
               if (!(await unlockWithBiometrics())) {
-                return;
+                setIsLoading(false);
+                return false;
               }
             }
             if (wallet.getBalance && wallet.getBalance() > 0 && wallet.allowSend && wallet.allowSend()) {
@@ -143,7 +147,14 @@ const WalletDetails: React.FC = () => {
           },
           style: 'destructive',
         },
-        { text: loc._.cancel, onPress: () => {}, style: 'cancel' },
+        {
+          text: loc._.cancel,
+          onPress: () => {
+            setIsLoading(false);
+            return false;
+          },
+          style: 'cancel',
+        },
       ],
       options: { cancelable: false },
     });
@@ -271,12 +282,6 @@ const WalletDetails: React.FC = () => {
   });
 
   useEffect(() => {
-    setOptions({
-      headerBackTitleVisible: true,
-    });
-  }, [setOptions]);
-
-  useEffect(() => {
     if (wallets.some(w => w.getID() === walletID)) {
       setSelectedWalletID(walletID);
     }
@@ -362,12 +367,17 @@ const WalletDetails: React.FC = () => {
   const purgeTransactions = async () => {
     if (backdoorPressed < 10) return setBackdoorPressed(backdoorPressed + 1);
     setBackdoorPressed(0);
-    const msg = 'Transactions purged. Pls go to main screen and back to rerender screen';
+    const msg = 'Transactions & balances purged. Pls go to main screen and back to rerender screen';
 
     if (wallet.type === HDSegwitBech32Wallet.type) {
       wallet._txs_by_external_index = {};
       wallet._txs_by_internal_index = {};
       presentAlert({ message: msg });
+
+      wallet._balances_by_external_index = {};
+      wallet._balances_by_internal_index = {};
+      wallet._lastTxFetch = 0;
+      wallet._lastBalanceFetch = 0;
     }
 
     // @ts-expect-error: Need to fix later
@@ -376,6 +386,15 @@ const WalletDetails: React.FC = () => {
       wallet._hdWalletInstance._txs_by_external_index = {};
       // @ts-expect-error: Need to fix later
       wallet._hdWalletInstance._txs_by_internal_index = {};
+
+      // @ts-expect-error: Need to fix later
+      wallet._hdWalletInstance._balances_by_external_index = {};
+      // @ts-expect-error: Need to fix later
+      wallet._hdWalletInstance._balances_by_internal_index = {};
+      // @ts-expect-error: Need to fix later
+      wallet._hdWalletInstance._lastTxFetch = 0;
+      // @ts-expect-error: Need to fix later
+      wallet._hdWalletInstance._lastBalanceFetch = 0;
       presentAlert({ message: msg });
     }
   };
@@ -397,13 +416,9 @@ const WalletDetails: React.FC = () => {
     }
   }, [wallet, walletName, saveToDisk]);
 
-  useEffect(() => {
-    const subscribe = addListener('beforeRemove', () => {
-      walletNameTextInputOnBlur();
-    });
-
-    return subscribe;
-  }, [addListener, walletName, walletNameTextInputOnBlur]);
+  usePreventRemove(false, () => {
+    walletNameTextInputOnBlur();
+  });
 
   const onViewMasterFingerPrintPress = () => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -527,7 +542,7 @@ const WalletDetails: React.FC = () => {
               </View>
             </>
             <>
-              <Text onPress={purgeTransactions} style={[styles.textLabel2, stylesHook.textLabel2]}>
+              <Text onPress={purgeTransactions} style={[styles.textLabel2, stylesHook.textLabel2]} testID="PurgeBackdoorButton">
                 {loc.transactions.transactions_count.toLowerCase()}
               </Text>
               <BlueText>{wallet.getTransactions().length}</BlueText>
@@ -639,7 +654,7 @@ const WalletDetails: React.FC = () => {
               {wallet.allowXpub && wallet.allowXpub() && (
                 <>
                   <BlueSpacing20 />
-                  <SecondButton onPress={navigateToXPub} testID="XPub" title={loc.wallets.details_show_xpub} />
+                  <SecondButton onPress={navigateToXPub} testID="XpubButton" title={loc.wallets.details_show_xpub} />
                 </>
               )}
               {wallet.allowSignVerifyMessage && wallet.allowSignVerifyMessage() && (

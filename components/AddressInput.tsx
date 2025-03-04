@@ -11,9 +11,6 @@ interface AddressInputProps {
   address?: string;
   placeholder?: string;
   onChangeText: (text: string) => void;
-  onBarScanned: (ret: { data?: any }) => void;
-  scanButtonTapped?: () => void;
-  launchedBy?: string;
   editable?: boolean;
   inputAccessoryViewID?: string;
   onFocus?: () => void;
@@ -43,9 +40,6 @@ const AddressInput = ({
   testID = 'AddressInput',
   placeholder = loc.send.details_address,
   onChangeText,
-  onBarScanned,
-  scanButtonTapped = () => {},
-  launchedBy,
   editable = true,
   inputAccessoryViewID,
   onFocus = () => {},
@@ -108,15 +102,7 @@ const AddressInput = ({
         keyboardType={keyboardType}
         {...(skipValidation ? { onBlur } : { onBlur: onBlurEditing })}
       />
-      {editable ? (
-        <AddressInputScanButton
-          isLoading={isLoading}
-          launchedBy={launchedBy}
-          scanButtonTapped={scanButtonTapped}
-          onBarScanned={onBarScanned}
-          onChangeText={onChangeText}
-        />
-      ) : null}
+      {editable ? <AddressInputScanButton isLoading={isLoading} onChangeText={onChangeText} /> : null}
     </View>
   );
 };

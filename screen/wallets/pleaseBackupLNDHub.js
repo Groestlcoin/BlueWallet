@@ -7,11 +7,10 @@ import CopyTextToClipboard from '../../components/CopyTextToClipboard';
 import QRCodeComponent from '../../components/QRCodeComponent';
 import SafeArea from '../../components/SafeArea';
 import { useTheme } from '../../components/themes';
-import { disallowScreenshot } from 'react-native-screen-capture';
 import loc from '../../loc';
 import { useStorage } from '../../hooks/context/useStorage';
 import { useSettings } from '../../hooks/context/useSettings';
-import { isDesktop } from '../../blue_modules/environment';
+import { enableScreenProtect, disableScreenProtect } from '../../helpers/screenProtect';
 
 const PleaseBackupLNDHub = () => {
   const { wallets } = useStorage();
@@ -22,10 +21,13 @@ const PleaseBackupLNDHub = () => {
   const [qrCodeSize, setQRCodeSize] = useState(90);
   const { isPrivacyBlurEnabled } = useSettings();
 
-  const handleBackButton = useCallback(() => {
-    navigation.getParent().pop();
-    return true;
+  const dismiss = useCallback(() => {
+    navigation.getParent().goBack();
   }, [navigation]);
+  const handleBackButton = useCallback(() => {
+    dismiss();
+    return true;
+  }, [dismiss]);
   const styles = StyleSheet.create({
     root: {
       backgroundColor: colors.elevated,
@@ -41,15 +43,15 @@ const PleaseBackupLNDHub = () => {
   });
 
   useEffect(() => {
-    if (!isDesktop) disallowScreenshot(isPrivacyBlurEnabled);
+    if (isPrivacyBlurEnabled) {
+      enableScreenProtect();
+    }
     BackHandler.addEventListener('hardwareBackPress', handleBackButton);
     return () => {
-      if (!isDesktop) disallowScreenshot(false);
+      disableScreenProtect();
       BackHandler.removeEventListener('hardwareBackPress', handleBackButton);
     };
   }, [handleBackButton, isPrivacyBlurEnabled]);
-
-  const pop = () => navigation.getParent().pop();
 
   const onLayout = e => {
     const { height, width } = e.nativeEvent.layout;
@@ -66,7 +68,7 @@ const PleaseBackupLNDHub = () => {
         <QRCodeComponent value={wallet.getSecret()} size={qrCodeSize} />
         <CopyTextToClipboard text={wallet.getSecret()} />
         <BlueSpacing20 />
-        <Button onPress={pop} title={loc.pleasebackup.ok_lnd} />
+        <Button onPress={dismiss} title={loc.pleasebackup.ok_lnd} />
       </ScrollView>
     </SafeArea>
   );
