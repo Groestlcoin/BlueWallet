@@ -48,7 +48,7 @@ object MarketAPI {
         } else {
             when (source) {
                 "CoinGecko" -> "https://api.coingecko.com/api/v3/simple/price?ids=groestlcoin&vs_currencies=${endPointKey.lowercase()}"
-                else -> "https://api.coingecko.com/api/v3/simple/price?ids=groestlcoin&vs_currencies=${endPointKey.lowercase()}"
+                else -> "https://min-api.cryptocompare.com/data/price?fsym=GRS&tsyms=${endPointKey.uppercase()}"
             }
         }
     }
@@ -57,6 +57,7 @@ object MarketAPI {
         return try {
             val json = JSONObject(jsonString)
             when (source) {
+
                 "CoinGecko" -> json.getJSONObject("groestlcoin").getString(endPointKey.lowercase())
                 else -> null
             }

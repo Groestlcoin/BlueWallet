@@ -1,3 +1,4 @@
+import { fetch } from '../util/fetch';
 import untypedFiatUnit from './fiatUnits.json';
 
 export const FiatUnitSource = {
@@ -6,7 +7,8 @@ export const FiatUnitSource = {
 
 const handleError = (source: string, ticker: string, error: Error) => {
   throw new Error(
-    `Could not update rate for ${ticker} from ${source}: ${error.message}. ` + `Make sure the network you're on has access to ${source}.`,
+    `Could not update rate for ${ticker} from ${source}\n: ${error.message}. ` +
+      `\nMake sure the network you're on has access to ${source}.`,
   );
 };
 

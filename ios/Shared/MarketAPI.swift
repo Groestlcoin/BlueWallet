@@ -14,8 +14,8 @@ class MarketAPI {
         switch source {
         case "CoinGecko":
             return "https://api.coingecko.com/api/v3/simple/price?ids=groestlcoin&vs_currencies=\(endPointKey.lowercased())"
-        default:
-            return "https://api.coingecko.com/api/v3/simple/price?ids=groestlcoin&vs_currencies=\(endPointKey.lowercased())"
+        default: // CoinDesk
+            return "https://min-api.cryptocompare.com/data/price?fsym=GRS&tsyms=\(endPointKey)"
         }
     }
 

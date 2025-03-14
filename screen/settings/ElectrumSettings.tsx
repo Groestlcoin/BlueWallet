@@ -515,7 +515,6 @@ const ElectrumSettings: React.FC = () => {
             onChangeText={text => setHost(text.trim())}
             editable={!isLoading}
             keyboardType="default"
-            skipValidation
             onBlur={() => setIsAndroidAddressKeyboardVisible(false)}
             onFocus={() => setIsAndroidAddressKeyboardVisible(true)}
             inputAccessoryViewID={DoneAndDismissKeyboardInputAccessoryViewID}
@@ -611,9 +610,7 @@ const ElectrumSettings: React.FC = () => {
           onValueChange: onElectrumConnectionEnabledSwitchChange,
           value: isElectrumDisabled,
           testID: 'ElectrumConnectionEnabledSwitch',
-          disabled: isLoading,
         }}
-        disabled={isLoading}
         bottomDivider={false}
         subtitle={loc.settings.electrum_offline_description}
       />

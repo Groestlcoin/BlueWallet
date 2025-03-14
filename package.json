@@ -1,6 +1,6 @@
 {
   "name": "bluewallet",
-  "version": "7.1.3",
+  "version": "7.1.5",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -82,7 +82,7 @@
     "@bugsnag/react-native": "8.2.0",
     "@bugsnag/source-maps": "2.3.3",
     "@keystonehq/bc-ur-registry": "0.7.0",
-    "@lodev09/react-native-true-sheet": "github:BlueWallet/react-native-true-sheet#49ba54e",
+    "@lodev09/react-native-true-sheet": "github:BlueWallet/react-native-true-sheet#5945184a2fea9fe5ba8f5cfcdb20e3fc5eed6e37",
     "@ngraveio/bc-ur": "1.1.13",
     "@noble/secp256k1": "1.6.3",
     "@react-native-async-storage/async-storage": "2.1.0",
@@ -140,7 +140,7 @@
     "react-native-default-preference": "https://github.com/BlueWallet/react-native-default-preference.git#6338a1f1235e4130b8cfc2dd3b53015eeff2870c",
     "react-native-device-info": "14.0.4",
     "react-native-document-picker": "9.3.1",
-    "react-native-draglist": "github:BlueWallet/react-native-draglist#8c52785",
+    "react-native-draglist": "github:BlueWallet/react-native-draglist#2fb0c1f",
     "react-native-fs": "2.20.0",
     "react-native-gesture-handler": "2.23.1",
     "react-native-handoff": "github:BlueWallet/react-native-handoff#v0.0.4",
