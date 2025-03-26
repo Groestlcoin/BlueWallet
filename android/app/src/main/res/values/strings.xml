@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">GRS BlueWallet</string>
-        <string name="loading">Loading...</string>
+    <string name="loading">Loading...</string>
     <string name="last_updated">Last Updated</string>
     <string name="from">From</string>
+    <string name="market_widget_name">Groestlcoin Market</string>
+    <string name="market_widget_description">View real-time Groestlcoin market data including price, satoshi rate, and next block fee.</string>
 </resources>

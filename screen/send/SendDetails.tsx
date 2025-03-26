@@ -57,6 +57,7 @@ import ActionSheet from '../ActionSheet';
 import HeaderMenuButton from '../../components/HeaderMenuButton';
 import { CommonToolTipActions, ToolTipAction } from '../../typings/CommonToolTipActions';
 import { Action } from '../../components/types';
+import SafeArea from '../../components/SafeArea';
 
 interface IPaymentDestinations {
   address: string; // btc address or payment code
@@ -76,7 +77,7 @@ type NavigationProps = NativeStackNavigationProp<SendDetailsStackParamList, 'Sen
 type RouteProps = RouteProp<SendDetailsStackParamList, 'SendDetails'>;
 
 const SendDetails = () => {
-  const { wallets, setSelectedWalletID, sleep, txMetadata, saveToDisk } = useStorage();
+  const { wallets, sleep, txMetadata, saveToDisk } = useStorage();
   const navigation = useExtendedNavigation<NavigationProps>();
   const selectedDataProcessor = useRef<ToolTipAction | undefined>();
   const setParams = navigation.setParams;
@@ -246,7 +247,6 @@ const SendDetails = () => {
   // change header and reset state on wallet change
   useEffect(() => {
     if (!wallet) return;
-    setSelectedWalletID(wallet.getID());
 
     // reset other values
     setChangeAddress(null);
@@ -1246,7 +1246,7 @@ const SendDetails = () => {
             accessibilityRole="button"
             style={styles.selectTouch}
             onPress={() => {
-              navigation.navigate('SelectWallet', { chainType: Chain.ONCHAIN });
+              navigation.navigate('SelectWallet', { chainType: Chain.ONCHAIN, selectedWalletID: wallet?.getID() });
             }}
           >
             <Text style={styles.selectText}>{loc.wallets.select_wallet.toLowerCase()}</Text>
@@ -1258,7 +1258,7 @@ const SendDetails = () => {
             accessibilityRole="button"
             style={styles.selectTouch}
             onPress={() => {
-              navigation.navigate('SelectWallet', { chainType: Chain.ONCHAIN });
+              navigation.navigate('SelectWallet', { chainType: Chain.ONCHAIN, selectedWalletID: wallet?.getID() });
             }}
             disabled={!isEditable || isLoading}
           >
@@ -1370,7 +1370,7 @@ const SendDetails = () => {
   });
 
   return (
-    <View style={[styles.root, stylesHook.root]} onLayout={e => setWidth(e.nativeEvent.layout.width)}>
+    <SafeArea style={[styles.root, stylesHook.root]} onLayout={e => setWidth(e.nativeEvent.layout.width)}>
       <View>
         <FlatList
           keyboardShouldPersistTaps="always"
@@ -1441,7 +1441,7 @@ const SendDetails = () => {
       })}
 
       {renderWalletSelectionOrCoinsSelected()}
-    </View>
+    </SafeArea>
   );
 };
 
