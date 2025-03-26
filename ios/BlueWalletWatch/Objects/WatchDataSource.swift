@@ -19,30 +19,30 @@ struct Notifications {
 /// Handles WatchConnectivity and data synchronization between iOS and Watch apps.
 class WatchDataSource: NSObject, ObservableObject, WCSessionDelegate {
     // MARK: - Singleton Instance
-  
+
   static func postDataUpdatedNotification() {
       NotificationCenter.default.post(Notifications.dataUpdated)
     }
 
-    
+
     static let shared = WatchDataSource()
-    
+
     // MARK: - Published Properties
-    
+
     /// The list of wallets to be displayed on the Watch app.
     @Published var wallets: [Wallet] = []
-    
+
     @Published var isDataLoaded: Bool = false
-    
+
     // MARK: - Private Properties
-    
+
     private let groupUserDefaults = UserDefaults(suiteName: UserDefaultsGroupKey.GroupName.rawValue)
     private let keychain = KeychainHelper.shared
     private let session: WCSession
     private var cancellables = Set<AnyCancellable>()
-    
+
     // MARK: - Initializer
-    
+
     private override init() {
         guard WCSession.isSupported() else {
             print("WCSession is not supported on this device.")
@@ -52,17 +52,17 @@ class WatchDataSource: NSObject, ObservableObject, WCSessionDelegate {
         }
         self.session = WCSession.default
         super.init()
-        
+
         // Set delegate and setup bindings before trying to load data
         self.session.delegate = self
         setupBindings()
-        
+
         // Load cached data from keychain to show something while waiting for fresh data
         loadKeychainData()
     }
-    
+
     // MARK: - Public Methods
-    
+
     /// Starts the WatchConnectivity session.
     func startSession() {
         if session.activationState != .activated {
@@ -76,15 +76,15 @@ class WatchDataSource: NSObject, ObservableObject, WCSessionDelegate {
             }
         }
     }
-    
+
     /// Deactivates the WatchConnectivity session (if needed).
     /// Note: WCSession does not provide a deactivate method, but you can handle any necessary cleanup here.
     func deactivateSession() {
         // Handle any necessary cleanup here.
     }
-    
+
     // MARK: - Data Binding
-    
+
     /// Sets up bindings to observe changes to `wallets` and perform actions accordingly.
     private func setupBindings() {
         // Observe changes to wallets and perform actions if needed.
@@ -95,9 +95,9 @@ class WatchDataSource: NSObject, ObservableObject, WCSessionDelegate {
             }
             .store(in: &cancellables)
     }
-    
+
     // MARK: - Keychain Operations
-    
+
     /// Loads wallets data from the Keychain asynchronously.
     private func loadKeychainData() {
         DispatchQueue.global(qos: .background).async { [weak self] in
@@ -107,10 +107,10 @@ class WatchDataSource: NSObject, ObservableObject, WCSessionDelegate {
                 print("No existing wallets data found in Keychain.")
                 return
             }
-            
+
             // Filter wallets to include only on-chain wallets.
             let onChainWallets = decodedWallets.filter { $0.chain == .onchain }
-            
+
             DispatchQueue.main.async {
                 if onChainWallets != self.wallets {
                     self.wallets = onChainWallets
@@ -120,7 +120,7 @@ class WatchDataSource: NSObject, ObservableObject, WCSessionDelegate {
             }
         }
     }
-    
+
     /// Saves the current wallets data to the Keychain asynchronously.
     private func saveWalletsToKeychain() {
         DispatchQueue.global(qos: .background).async { [weak self] in
@@ -138,16 +138,16 @@ class WatchDataSource: NSObject, ObservableObject, WCSessionDelegate {
             }
         }
     }
-    
+
     // MARK: - WatchConnectivity Methods
-    
+
     /// Handles the activation completion of the WCSession.
     func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
         if let error = error {
             print("[WatchKit 2] WCSession activation failed with error: \(error.localizedDescription)")
         } else {
             print("[WatchKit 2] WCSession activated with state: \(activationState.rawValue)")
-            
+
             if activationState == .activated {
                 DispatchQueue.main.async {
                     self.requestDataFromiOS()
@@ -155,24 +155,24 @@ class WatchDataSource: NSObject, ObservableObject, WCSessionDelegate {
             }
         }
     }
-    
+
     /// Handles received messages from the iOS app.
     func session(_ session: WCSession, didReceiveMessage message: [String : Any], replyHandler: @escaping ([String : Any]) -> Void) {
         processReceivedData(message)
     }
-    
+
     /// Handles received application context updates from the iOS app.
     func session(_ session: WCSession, didReceiveApplicationContext applicationContext: [String : Any]) {
         print("[WatchKit 2] Received application context: \(applicationContext.keys)")
         if applicationContext.isEmpty { return }
-        
+
         DispatchQueue.main.async {
             self.processReceivedData(applicationContext)
             // Post notification that data was updated
             WatchDataSource.postDataUpdatedNotification()
         }
     }
-    
+
     /// Requests current data from the iOS app
     func requestDataFromiOS() {
         guard session.activationState == .activated else {
@@ -180,9 +180,9 @@ class WatchDataSource: NSObject, ObservableObject, WCSessionDelegate {
             startSession() // Try to activate the session
             return
         }
-        
+
         let message = ["message": "sendApplicationContext"]
-        
+
         // First check if we can use direct messaging
         if session.isReachable {
             print("[WatchKit 2] iOS app is reachable, sending direct message")
@@ -194,7 +194,7 @@ class WatchDataSource: NSObject, ObservableObject, WCSessionDelegate {
                 }
             }, errorHandler: { error in
                 print("[WatchKit 2] Error requesting application context: \(error.localizedDescription)")
-                
+
                 // Fallback to application context as a backup
                 self.sendApplicationContextRequest()
             })
@@ -203,7 +203,7 @@ class WatchDataSource: NSObject, ObservableObject, WCSessionDelegate {
             sendApplicationContextRequest()
         }
     }
-    
+
     private func sendApplicationContextRequest() {
         do {
             try session.updateApplicationContext(["message": "sendApplicationContext"])
@@ -212,26 +212,26 @@ class WatchDataSource: NSObject, ObservableObject, WCSessionDelegate {
             print("[WatchKit 2] Failed to send context update request: \(error.localizedDescription)")
         }
     }
-    
+
     // Enhance session reachability notification
     func sessionReachabilityDidChange(_ session: WCSession) {
         print("[WatchKit 2] Session reachability changed: \(session.isReachable)")
-        
+
         if session.isReachable {
             // If iOS app becomes reachable, request fresh data
             requestDataFromiOS()
         }
     }
-    
+
     // MARK: - Data Processing
-    
+
     /// Processes received data from the iOS app.
     /// - Parameter data: The data received either as a message or application context.
     private func processReceivedData(_ data: [String: Any]) {
         if let preferredFiatCurrency = data["preferredFiatCurrency"] as? String {
             // Handle preferred fiat currency update.
             groupUserDefaults?.set(preferredFiatCurrency, forKey: "preferredCurrency")
-            
+
             // Fetch and update market data based on the new preferred currency.
             updateMarketData(for: preferredFiatCurrency)
         } else {
@@ -239,7 +239,7 @@ class WatchDataSource: NSObject, ObservableObject, WCSessionDelegate {
             processWalletsData(walletsInfo: data)
         }
     }
-    
+
     /// Processes wallets data received from the iOS app.
     /// - Parameter walletsInfo: The wallets data received as a dictionary.
     private func processWalletsData(walletsInfo: [String: Any]) {
@@ -247,9 +247,9 @@ class WatchDataSource: NSObject, ObservableObject, WCSessionDelegate {
             print("No wallets data found in received context.")
             return
         }
-        
+
         var processedWallets: [Wallet] = []
-        
+
         for entry in walletsToProcess {
             guard let label = entry["label"] as? String,
                   let balance = entry["balance"] as? Double,
@@ -260,7 +260,7 @@ class WatchDataSource: NSObject, ObservableObject, WCSessionDelegate {
                 print("Incomplete wallet entry found. Skipping.")
                 continue
             }
-            
+
             var transactionsProcessed: [Transaction] = []
             for transactionEntry in transactions {
                 guard let timeString = transactionEntry["time"] as? String,
@@ -270,29 +270,29 @@ class WatchDataSource: NSObject, ObservableObject, WCSessionDelegate {
                     print("Incomplete transaction entry found. Skipping.")
                     continue
                 }
-                
+
                 guard let time = ISO8601DateFormatter().date(from: timeString) else {
                     print("Invalid date format for transaction. Skipping.")
                     continue
                 }
-                
+
                 let amount = Decimal(amountDouble)
-                
+
                 let transactionType = TransactionType.fromRawString(type)
-                
+
                 let transaction = Transaction(time: time, memo: memo, type: transactionType, amount: amount)
                 transactionsProcessed.append(transaction)
             }
-            
+
             let receiveAddress = entry["receiveAddress"] as? String ?? ""
             let xpub = entry["xpub"] as? String ?? ""
             let hideBalance = entry["hideBalance"] as? Bool ?? false
             let paymentCode = entry["paymentCode"] as? String
             let chain = Chain(rawString: chainString)
-            
+
             let wallet = Wallet(
                 label: label,
-                balance: "\(balance) BTC",
+                balance: "\(balance) GRS",
                 type: WalletType(rawString: typeString),
                 chain: chain,
                 preferredBalanceUnit: BitcoinUnit(rawString: preferredBalanceUnitString),
@@ -304,7 +304,7 @@ class WatchDataSource: NSObject, ObservableObject, WCSessionDelegate {
             )
             processedWallets.append(wallet)
         }
-        
+
         // Update the published `wallets` property on the main thread.
         DispatchQueue.main.async { [weak self] in
             self?.wallets = processedWallets
@@ -312,7 +312,7 @@ class WatchDataSource: NSObject, ObservableObject, WCSessionDelegate {
             WatchDataSource.postDataUpdatedNotification()
         }
     }
-    
+
     /// Fetches market data based on the preferred fiat currency.
     /// - Parameter fiatCurrency: The preferred fiat currency string.
     private func updateMarketData(for fiatCurrency: String) {
@@ -328,12 +328,12 @@ class WatchDataSource: NSObject, ObservableObject, WCSessionDelegate {
                 // Consider implementing retry logic or fallback mechanism
                 return
             }
-            
+
             guard let marketData = marketData as? MarketData else {
                 print("Invalid market data format received")
                 return
             }
-            
+
             do {
                 let widgetData = WidgetDataStore(rate: "\(marketData.rate)", lastUpdate: marketData.dateString, rateDouble: marketData.rate)
                 if let encodedData = try? JSONEncoder().encode(widgetData) {
@@ -347,9 +347,9 @@ class WatchDataSource: NSObject, ObservableObject, WCSessionDelegate {
             }
         }
     }
-    
+
     // MARK: - Wallet Actions
-    
+
     /// Requests a Lightning Invoice from the iOS app.
     /// - Parameters:
     ///   - walletIdentifier: The index of the wallet in the `wallets` array.
@@ -387,7 +387,7 @@ class WatchDataSource: NSObject, ObservableObject, WCSessionDelegate {
             responseHandler("")
         })
     }
-    
+
     /// Toggles the visibility of the wallet's balance.
     /// - Parameters:
     ///   - walletIdentifier: The index of the wallet in the `wallets` array.
@@ -409,9 +409,9 @@ class WatchDataSource: NSObject, ObservableObject, WCSessionDelegate {
             responseHandler(false)
         })
     }
-    
+
     // MARK: - Complications Reload
-    
+
     /// Reloads all active complications on the Watch face.
     private func reloadComplications() {
         let server = CLKComplicationServer.sharedInstance()
