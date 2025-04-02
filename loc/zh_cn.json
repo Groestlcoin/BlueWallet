@@ -244,7 +244,7 @@
     "electrum_connected": "已连接",
     "electrum_connected_not": "未连接",
     "electrum_error_connect": "无法连接到所提供的 Electrum 服务器",
-    "electrum_error_connect_tor": "无法连接到所提供的 Electrum 服务器。请确保已连接 Orbot 应用程序并重试。",
+    "electrum_error_connect_tor": "无法连接到所提供的 Electrum-GRS 服务器。请确保已连接 Orbot 应用程序并重试。",
     "lndhub_uri": "举例：{example}",
     "electrum_host": "举例：{example}",
     "electrum_offline_mode": "离线模式",
