@@ -560,11 +560,11 @@ export const getMempoolTransactionsByAddress = async function (address: string):
 export const ping = async function () {
   try {
     await mainClient.server_ping();
-  } catch (_) {
-    mainConnected = false;
-    return false;
-  }
-  return true;
+    return true;
+  } catch (_) {}
+
+  mainConnected = false;
+  return false;
 };
 
 // exported only to be used in unit tests
@@ -1039,12 +1039,6 @@ export const waitTillConnected = async function (): Promise<boolean> {
     waitTillConnectedInterval = setInterval(() => {
       if (mainConnected) {
         clearInterval(waitTillConnectedInterval);
-        return resolve(true);
-      }
-
-      if (wasConnectedAtLeastOnce && mainClient.status === 1) {
-        clearInterval(waitTillConnectedInterval);
-        mainConnected = true;
         return resolve(true);
       }
 
