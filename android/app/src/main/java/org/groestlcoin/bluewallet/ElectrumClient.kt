@@ -32,9 +32,6 @@ class ElectrumClient {
             ElectrumServer("electrum1.groestlcoin.org", 50001, false),
             ElectrumServer("electrum2.groestlcoin.org", 50001, false)
         )
-
-        // Store the last known block height
-        private var lastKnownBlockHeight = -1
     }
 
     private var socket: Socket? = null
@@ -42,7 +39,6 @@ class ElectrumClient {
     private var inputReader: BufferedReader? = null
     private var context: Context? = null
     private var networkStatusListener: NetworkStatusListener? = null
-    private var blockHeightListener: BlockHeightListener? = null
 
     data class ElectrumServer(val host: String, val port: Int, val isSsl: Boolean)
 
@@ -63,27 +59,12 @@ class ElectrumClient {
     }
 
     /**
-     * Set a listener for block height changes
-     */
-    fun setBlockHeightListener(listener: BlockHeightListener) {
-        Log.d(TAG, "Setting block height listener")
-        this.blockHeightListener = listener
-    }
-
-    /**
      * Interface for listening to network status changes
      */
     interface NetworkStatusListener {
         fun onNetworkStatusChanged(isConnected: Boolean)
         fun onConnectionError(error: String)
         fun onConnectionSuccess()
-    }
-
-    /**
-     * Interface for listening to block height changes
-     */
-    interface BlockHeightListener {
-        fun onBlockHeightChanged(newHeight: Int, previousHeight: Int)
     }
 
     /**
@@ -227,73 +208,6 @@ class ElectrumClient {
         Log.d(TAG, "Connection attempt to ${server.host}:${server.port} completed in ${duration}ms, result: $result")
 
         result
-    }
-
-    /**
-     * Fetch the current blockchain height
-     * @return the current block height or -1 if failed
-     */
-    suspend fun fetchBlockHeight(): Int = withContext(Dispatchers.IO) {
-        Log.i(TAG, "Fetching current block height")
-        var blockHeight = -1
-
-        try {
-            if (!isNetworkAvailable()) {
-                Log.e(TAG, "Cannot fetch block height: No network connection available")
-                return@withContext -1
-            }
-
-            // Connect to a server if not already connected
-            if (socket == null || socket?.isConnected != true) {
-                Log.d(TAG, "No active connection, attempting to connect before fetching block height")
-                if (!connectToNextAvailable(validateCertificates = false)) {
-                    Log.e(TAG, "Failed to connect to Electrum-GRS server for block height")
-                    return@withContext -1
-                }
-            }
-
-            val message = "{\"id\": 2, \"method\": \"blockchain.headers.subscribe\", \"params\": []}\n"
-            Log.d(TAG, "Sending blockchain.headers.subscribe request")
-            if (!send(message.toByteArray())) {
-                Log.e(TAG, "Failed to send block height request")
-                return@withContext -1
-            }
-
-            val response = receive()
-            if (response.isEmpty()) {
-                Log.e(TAG, "Empty response when fetching block height")
-                return@withContext -1
-            }
-
-            val jsonResponse = String(response)
-            Log.d(TAG, "Received block height response: $jsonResponse")
-
-            val json = JSONObject(jsonResponse)
-            if (json.has("result")) {
-                val result = json.getJSONObject("result")
-                if (result.has("height")) {
-                    blockHeight = result.getInt("height")
-                    Log.i(TAG, "Current block height: $blockHeight")
-
-                    // Check if the block height has changed
-                    if (lastKnownBlockHeight != -1 && blockHeight > lastKnownBlockHeight) {
-                        Log.i(TAG, "Block height changed from $lastKnownBlockHeight to $blockHeight")
-                        blockHeightListener?.onBlockHeightChanged(blockHeight, lastKnownBlockHeight)
-                    }
-
-                    // Update the last known block height
-                    lastKnownBlockHeight = blockHeight
-                } else {
-                    Log.e(TAG, "Block height not found in response")
-                }
-            } else {
-                Log.e(TAG, "Invalid block height response - missing 'result' field")
-            }
-        } catch (e: Exception) {
-            Log.e(TAG, "Error fetching block height: ${e.javaClass.simpleName} - ${e.message}", e)
-        }
-
-        return@withContext blockHeight
     }
 
     /**

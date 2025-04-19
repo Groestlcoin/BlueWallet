@@ -15,7 +15,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTheme } from './themes';
-import { useIsLargeScreen } from '../hooks/useIsLargeScreen';
+import { useSizeClass, SizeClass } from '../blue_modules/sizeClass';
 import { isDesktop } from '../blue_modules/environment';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
@@ -46,7 +46,6 @@ const useFloatButtonAnimation = (height: number) => {
   useEffect(() => {
     slideAnimation.setValue(height);
 
-    // Skip animation on desktop
     if (isDesktop) {
       slideAnimation.setValue(0);
       return;
@@ -61,7 +60,6 @@ const useFloatButtonAnimation = (height: number) => {
   }, [height, slideAnimation]);
 
   const configureLayoutAnimation = useCallback(() => {
-    // Skip layout animation on desktop
     if (isDesktop) return;
 
     LayoutAnimation.configureNext({
@@ -86,7 +84,6 @@ const useFloatButtonAnimation = (height: number) => {
   const animateBorderRadius = useCallback(
     (buttonRadius: number, singleRadius: number, onComplete?: () => void) => {
       if (isDesktop) {
-        // On desktop, apply values immediately without animation
         animatedButtonRadius.setValue(buttonRadius);
         animatedSingleButtonRadius.setValue(singleRadius);
         if (onComplete) onComplete();
@@ -118,19 +115,49 @@ const useFloatButtonAnimation = (height: number) => {
     slideAnimation,
     animatedButtonRadius,
     animatedSingleButtonRadius,
-    isAnimating: isDesktop ? false : isAnimating, // Never report animating state on desktop
+    isAnimating: isDesktop ? false : isAnimating,
     setIsAnimating,
     configureLayoutAnimation,
     animateBorderRadius,
   };
 };
 
-const useFloatButtonLayout = (width: number, isLargeScreen: boolean) => {
+const useFloatButtonLayout = (width: number, sizeClass: SizeClass) => {
+  const lastVerticalDecision = useRef(false);
+
+  const shouldUseVerticalLayout = useCallback(
+    (totalWidthNeeded: number, availableWidth: number, totalChildren: number) => {
+      if (sizeClass !== SizeClass.Large || totalChildren <= 1) return false;
+
+      const minWidthPerButton = 130;
+      const totalButtonsWidth = minWidthPerButton * totalChildren;
+      const totalSpacing = LAYOUT.BUTTON_MARGIN * (totalChildren - 1);
+      const minRequiredWidth = totalButtonsWidth + totalSpacing;
+
+      const wouldBeTooNarrow = availableWidth < minRequiredWidth;
+
+      if (!lastVerticalDecision.current && wouldBeTooNarrow) {
+        const shouldSwitch = availableWidth < minRequiredWidth * 0.9;
+        lastVerticalDecision.current = shouldSwitch;
+        return shouldSwitch;
+      }
+
+      if (lastVerticalDecision.current && !wouldBeTooNarrow) {
+        const shouldSwitchBack = availableWidth > minRequiredWidth * 1.2;
+        lastVerticalDecision.current = !shouldSwitchBack;
+        return !shouldSwitchBack;
+      }
+
+      return lastVerticalDecision.current;
+    },
+    [sizeClass],
+  );
+
   const calculateButtonWidth = useCallback(
     (containerWidth: number, totalChildren: number): number => {
       if (containerWidth <= 0) return 0;
 
-      const drawerOffset = isLargeScreen ? LAYOUT.DRAWER_WIDTH : 0;
+      const drawerOffset = sizeClass === SizeClass.Large ? LAYOUT.DRAWER_WIDTH : 0;
       const availableWidth = width - drawerOffset - LAYOUT.CONTAINER_SIDE_MARGIN * 2;
 
       const contentWidth = Math.ceil(containerWidth);
@@ -139,13 +166,19 @@ const useFloatButtonLayout = (width: number, isLargeScreen: boolean) => {
       const totalSpacersWidth = (totalChildren - 1) * LAYOUT.BUTTON_MARGIN;
       const totalWidthNeeded = totalButtonWidth + totalSpacersWidth + LAYOUT.SAFETY_MARGIN;
 
-      const effectiveMinButtonWidth = isLargeScreen ? LAYOUT.MIN_BUTTON_WIDTH_LARGE : LAYOUT.MIN_BUTTON_WIDTH;
-      const shouldBeVertical = isLargeScreen && totalWidthNeeded > availableWidth && totalChildren > 1;
+      const effectiveMinButtonWidth =
+        sizeClass === SizeClass.Large
+          ? LAYOUT.MIN_BUTTON_WIDTH_LARGE
+          : sizeClass === SizeClass.Regular
+            ? LAYOUT.MIN_BUTTON_WIDTH
+            : LAYOUT.MIN_BUTTON_WIDTH * 0.85;
+
+      const shouldBeVertical = shouldUseVerticalLayout(totalWidthNeeded, availableWidth, totalChildren);
 
       let calculatedWidth;
 
       if (shouldBeVertical) {
-        calculatedWidth = isLargeScreen ? availableWidth - LAYOUT.CONTAINER_SIDE_MARGIN * 2 : availableWidth;
+        calculatedWidth = sizeClass === SizeClass.Large ? availableWidth - LAYOUT.CONTAINER_SIDE_MARGIN * 2 : availableWidth;
       } else {
         if (totalWidthNeeded > availableWidth) {
           const availableWidthPerButton = (availableWidth - totalSpacersWidth) / totalChildren;
@@ -155,38 +188,46 @@ const useFloatButtonLayout = (width: number, isLargeScreen: boolean) => {
         }
       }
 
-      const effectiveMinWidth = isLargeScreen ? LAYOUT.MIN_BUTTON_WIDTH * 1.2 : LAYOUT.MIN_BUTTON_WIDTH;
-      if (totalChildren === 1 && calculatedWidth < effectiveMinWidth - LAYOUT.PADDINGS * 2) {
-        calculatedWidth = effectiveMinWidth - LAYOUT.PADDINGS * 2;
+      if (totalChildren === 1 && !shouldBeVertical) {
+        const singleButtonMaxWidth = availableWidth * (sizeClass === SizeClass.Compact ? 0.7 : 0.5);
+        const effectiveSingleMinWidth = sizeClass === SizeClass.Large ? LAYOUT.MIN_BUTTON_WIDTH * 1.2 : LAYOUT.MIN_BUTTON_WIDTH;
+
+        calculatedWidth = Math.max(
+          effectiveSingleMinWidth - LAYOUT.PADDINGS * 2,
+          Math.min(calculatedWidth, singleButtonMaxWidth - LAYOUT.PADDINGS * 2),
+        );
       }
 
       return Math.floor(calculatedWidth);
     },
-    [width, isLargeScreen],
+    [width, sizeClass, shouldUseVerticalLayout],
   );
 
   const calculateVisualParameters = useCallback(
     (calculatedWidth: number, totalChildren: number) => {
-      const drawerOffset = isLargeScreen ? LAYOUT.DRAWER_WIDTH : 0;
+      const drawerOffset = sizeClass === SizeClass.Large ? LAYOUT.DRAWER_WIDTH : 0;
       const availableWidth = width - drawerOffset - LAYOUT.CONTAINER_SIDE_MARGIN * 2;
 
-      const buttonWidth = calculatedWidth + LAYOUT.PADDINGS * 2;
+      const buttonWidth = Math.max(calculatedWidth, LAYOUT.MIN_BUTTON_WIDTH_LARGE) + LAYOUT.PADDINGS * 2;
       const totalButtonWidth = buttonWidth * totalChildren;
       const totalSpacersWidth = (totalChildren - 1) * LAYOUT.BUTTON_MARGIN;
-      const totalWidthNeeded = totalButtonWidth + totalSpacersWidth + LAYOUT.SAFETY_MARGIN;
+      const totalWidthNeeded = totalButtonWidth + totalSpacersWidth;
 
-      const shouldBeVertical = isLargeScreen && totalWidthNeeded > availableWidth && totalChildren > 1;
+      const shouldBeVertical = shouldUseVerticalLayout(totalWidthNeeded, availableWidth, totalChildren);
 
-      const baseRadius = isLargeScreen
-        ? Math.min(LAYOUT.BUTTON_HEIGHT / 2, calculatedWidth / 8)
-        : Math.min(LAYOUT.BUTTON_HEIGHT / 2, calculatedWidth / 10);
+      let buttonRadius;
+      if (totalChildren === 1) {
+        buttonRadius = LAYOUT.BUTTON_HEIGHT / 2;
+      } else {
+        buttonRadius = Math.min(LAYOUT.DEFAULT_BORDER_RADIUS * 1.5, calculatedWidth / 12);
+      }
 
-      const buttonRadius = Math.max(LAYOUT.DEFAULT_BORDER_RADIUS, Math.floor(baseRadius));
-      const singleButtonRadius = totalChildren === 1 ? LAYOUT.BUTTON_HEIGHT / 2 : buttonRadius;
+      const multiButtonRadius = Math.max(LAYOUT.DEFAULT_BORDER_RADIUS, Math.floor(buttonRadius));
+      const singleButtonRadius = LAYOUT.BUTTON_HEIGHT / 2;
 
-      return { buttonRadius, singleButtonRadius, shouldBeVertical };
+      return { buttonRadius: multiButtonRadius, singleButtonRadius, shouldBeVertical };
     },
-    [width, isLargeScreen],
+    [width, sizeClass, shouldUseVerticalLayout],
   );
 
   const calculateContainerHeight = useCallback((childrenCount: number, isVerticalLayout: boolean) => {
@@ -200,10 +241,10 @@ const useFloatButtonLayout = (width: number, isLargeScreen: boolean) => {
   }, []);
 
   const calculateButtonFontSize = useMemo(() => {
-    const divisor = isLargeScreen ? 22 : 24;
+    const divisor = sizeClass === SizeClass.Large ? 22 : sizeClass === SizeClass.Regular ? 24 : 28;
     const baseSize = PixelRatio.roundToNearestPixel(width / divisor);
     return Math.min(LAYOUT.MAX_BUTTON_FONT_SIZE, baseSize);
-  }, [width, isLargeScreen]);
+  }, [width, sizeClass]);
 
   return {
     calculateButtonWidth,
@@ -321,13 +362,6 @@ interface ButtonContentProps {
   iconStyle: StyleProp<any>;
 }
 
-interface OrientationCache {
-  width: number;
-  isVertical: boolean;
-  buttonRadius: number;
-  singleButtonRadius: number;
-}
-
 const ButtonContent = ({ icon, text, textStyle, iconStyle }: ButtonContentProps) => (
   <>
     <View style={iconStyle}>{icon}</View>
@@ -403,7 +437,7 @@ export const FButton = ({
 export const FContainer = forwardRef<View, FContainerProps>((props, ref) => {
   const insets = useSafeAreaInsets();
   const { height, width } = useWindowDimensions();
-  const { isLargeScreen } = useIsLargeScreen();
+  const { sizeClass } = useSizeClass();
 
   const [newWidth, setNewWidth] = useState<number | undefined>(undefined);
   const [isVertical, setIsVertical] = useState(false);
@@ -413,9 +447,9 @@ export const FContainer = forwardRef<View, FContainerProps>((props, ref) => {
 
   const layoutWidth = useRef<number>(0);
   const layoutCalculated = useRef(false);
-  const initialLayoutDone = useRef(false);
-  const orientationKey = useRef<string>('');
-  const calculationCache = useRef<Record<string, OrientationCache>>({});
+  const orientationChangeTimestamp = useRef<number>(0);
+  const animationInProgress = useRef(false);
+  const pendingAnimationParams = useRef<any>(null);
 
   const bottomInsets = useMemo(
     () => ({
@@ -429,98 +463,94 @@ export const FContainer = forwardRef<View, FContainerProps>((props, ref) => {
 
   const { calculateButtonWidth, calculateVisualParameters, calculateContainerHeight, buttonFontSize } = useFloatButtonLayout(
     width,
-    isLargeScreen,
+    sizeClass,
   );
 
-  const getNormalizedOrientationKey = useCallback(() => {
-    const isPortrait = height > width;
-    const largerDim = Math.max(width, height);
-    const smallerDim = Math.min(width, height);
-    return `${largerDim}x${smallerDim}-${isPortrait ? 'portrait' : 'landscape'}-${isLargeScreen ? 'large' : 'small'}`;
-  }, [width, height, isLargeScreen]);
+  const handleBorderRadiusAnimation = useCallback(
+    (buttonRadius: number, singleRadius: number, shouldBeVertical: boolean, calculatedWidth: number) => {
+      const now = Date.now();
+      const isOrientationChange = Math.abs(width / height - height / width) > 0.8;
+
+      if (isOrientationChange) {
+        orientationChangeTimestamp.current = now;
+        setNewWidth(calculatedWidth);
+        setIsVertical(shouldBeVertical);
+        setButtonBorderRadius(buttonRadius);
+        setSingleButtonBorderRadius(singleRadius);
+        return;
+      }
+
+      if (animationInProgress.current) {
+        pendingAnimationParams.current = { buttonRadius, singleRadius, shouldBeVertical, calculatedWidth };
+        return;
+      }
+
+      if (isDesktop || now - orientationChangeTimestamp.current < 1000) {
+        setNewWidth(calculatedWidth);
+        setIsVertical(shouldBeVertical);
+        setButtonBorderRadius(buttonRadius);
+        setSingleButtonBorderRadius(singleRadius);
+        return;
+      }
+
+      animationInProgress.current = true;
+
+      if (shouldBeVertical !== isVertical) {
+        configureLayoutAnimation();
+      }
+
+      setNewWidth(calculatedWidth);
+      setIsVertical(shouldBeVertical);
+
+      animateBorderRadius(buttonRadius, singleRadius, () => {
+        setButtonBorderRadius(buttonRadius);
+        setSingleButtonBorderRadius(singleRadius);
+        animationInProgress.current = false;
+
+        if (pendingAnimationParams.current) {
+          const {
+            buttonRadius: nextRadius,
+            singleRadius: nextSingle,
+            shouldBeVertical: nextVertical,
+            calculatedWidth: nextWidth,
+          } = pendingAnimationParams.current;
+          pendingAnimationParams.current = null;
+
+          setTimeout(() => {
+            handleBorderRadiusAnimation(nextRadius, nextSingle, nextVertical, nextWidth);
+          }, 50);
+        }
+      });
+    },
+    [animateBorderRadius, configureLayoutAnimation, height, width, isVertical],
+  );
 
   useEffect(() => {
     if (!layoutReady || layoutWidth.current <= 0) return;
 
-    const normalizedKey = getNormalizedOrientationKey();
-    const cachedCalculation = calculationCache.current[normalizedKey];
+    const totalChildren = React.Children.toArray(props.children).filter(Boolean).length;
+    const calculatedWidth = calculateButtonWidth(layoutWidth.current, totalChildren);
+    const { buttonRadius, singleButtonRadius, shouldBeVertical } = calculateVisualParameters(calculatedWidth, totalChildren);
 
-    if (width > 900 && Object.keys(calculationCache.current).length > 5) {
-      calculationCache.current = {};
-    }
-
-    if (cachedCalculation) {
-      if (cachedCalculation.isVertical !== isVertical || newWidth !== cachedCalculation.width) {
-        // Only do layout animation on non-desktop
-        if (!isDesktop) {
-          configureLayoutAnimation();
-        }
-
-        setNewWidth(cachedCalculation.width);
-        setIsVertical(cachedCalculation.isVertical);
-
-        // Apply border radius changes (animation hook will handle desktop case)
-        animateBorderRadius(cachedCalculation.buttonRadius, cachedCalculation.singleButtonRadius, () => {
-          setButtonBorderRadius(cachedCalculation.buttonRadius);
-          setSingleButtonBorderRadius(cachedCalculation.singleButtonRadius);
-        });
-      } else {
-        setNewWidth(cachedCalculation.width);
-        setIsVertical(cachedCalculation.isVertical);
-        setButtonBorderRadius(cachedCalculation.buttonRadius);
-        setSingleButtonBorderRadius(cachedCalculation.singleButtonRadius);
-      }
+    if (shouldBeVertical !== isVertical || newWidth !== calculatedWidth) {
+      handleBorderRadiusAnimation(buttonRadius, singleButtonRadius, shouldBeVertical, calculatedWidth);
     } else {
-      const totalChildren = React.Children.toArray(props.children).filter(Boolean).length;
-
-      const calculatedWidth = calculateButtonWidth(layoutWidth.current, totalChildren);
-      const { buttonRadius, singleButtonRadius, shouldBeVertical } = calculateVisualParameters(calculatedWidth, totalChildren);
-
-      if (shouldBeVertical !== isVertical || newWidth !== calculatedWidth) {
-        // Only do layout animation on non-desktop
-        if (!isDesktop) {
-          configureLayoutAnimation();
-        }
-
-        setNewWidth(calculatedWidth);
-        setIsVertical(shouldBeVertical);
-
-        // Apply border radius changes (animation hook will handle desktop case)
-        animateBorderRadius(buttonRadius, singleButtonRadius, () => {
-          setButtonBorderRadius(buttonRadius);
-          setSingleButtonBorderRadius(singleButtonRadius);
-        });
-      } else {
-        setNewWidth(calculatedWidth);
-        setIsVertical(shouldBeVertical);
-        setButtonBorderRadius(buttonRadius);
-        setSingleButtonBorderRadius(singleButtonRadius);
-      }
-
-      calculationCache.current[normalizedKey] = {
-        width: calculatedWidth,
-        isVertical: shouldBeVertical,
-        buttonRadius,
-        singleButtonRadius,
-      };
+      setNewWidth(calculatedWidth);
+      setIsVertical(shouldBeVertical);
+      setButtonBorderRadius(buttonRadius);
+      setSingleButtonBorderRadius(singleButtonRadius);
     }
 
     layoutCalculated.current = true;
-    if (!initialLayoutDone.current) {
-      orientationKey.current = normalizedKey;
-      initialLayoutDone.current = true;
-    }
   }, [
     layoutReady,
     width,
     height,
     props.children,
-    isLargeScreen,
-    getNormalizedOrientationKey,
+    sizeClass,
     calculateButtonWidth,
     calculateVisualParameters,
-    configureLayoutAnimation,
-    animateBorderRadius,
+    handleBorderRadiusAnimation,
     isVertical,
     newWidth,
   ]);

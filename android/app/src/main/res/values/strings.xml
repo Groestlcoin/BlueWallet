@@ -6,7 +6,7 @@
 
     <!-- Market Widget -->
     <string name="market_widget_name">Groestlcoin Market</string>
-    <string name="market_widget_description">View real-time Groestlcoin market data including price, satoshi rate, and next block fee.</string>
+    <string name="market_widget_description">View the latest Groestlcoin market data including price, satoshi rate, and next block fee.</string>
     <string name="market_title">Market</string>
     <string name="market_next_block">Next Block</string>
     <string name="market_sats_label">Gros/%s</string>
@@ -14,8 +14,11 @@
 
     <!-- Groestlcoin Price Widget -->
     <string name="bitcoin_price_widget_name">Groestlcoin Price</string>
-    <string name="bitcoin_price_widget_description">View real-time Groestlcoin price in your preferred currency</string>
+    <string name="bitcoin_price_widget_description">View the latest Groestlcoin price in your preferred currency</string>
     <string name="offline">Offline</string>
     <string name="price_from">From:</string>
     <string name="price_label">Price</string>
+
+    <string name="loading_placeholder">%1$s</string>
+    <string name="error_placeholder">%1$s</string>
 </resources>
