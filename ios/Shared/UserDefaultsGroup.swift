@@ -24,10 +24,8 @@ let hardcodedPeers = DefaultElectrumPeers.map { settings in
 
 let DefaultElectrumPeers = [
  UserDefaultsElectrumSettings(host: "electrum1.groestlcoin.org", port: 50001, sslPort: 50002),
-    // UserDefaultsElectrumSettings(host: "electrum2.groestlcoin.org", port: 50001, sslPort: 50002),
-    UserDefaultsElectrumSettings(host: "electrum11.groestlcoin.org", port: 50001, sslPort: 50002),
-    UserDefaultsElectrumSettings(host: "electrum12.groestlcoin.org", port: 50001, sslPort: 50002),
-    UserDefaultsElectrumSettings(host: "electrum13.groestlcoin.org", port: 50001, sslPort: 50002),
+    // UserDefaultsElectrumSettings(host: "electrum3.groestlcoin.org", port: 50001, sslPort: 50002),
+    UserDefaultsElectrumSettings(host: "electrum2.groestlcoin.org", port: 50001, sslPort: 50002),
 ]
 
 class UserDefaultsGroup {
