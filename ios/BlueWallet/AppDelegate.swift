@@ -13,11 +13,11 @@ class AppDelegate: RCTAppDelegate, UNUserNotificationCenterDelegate {
 
     override func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
         clearFilesIfNeeded()
-        
+
         // Fix app group UserDefaults initialization
-        let suiteName = "group.io.bluewallet.bluewallet"
+        let suiteName = "group.org.groestlcoin.bluewallet123"
         userDefaultsGroup = UserDefaults(suiteName: suiteName)
-        
+
         // Ensure the suite exists and is accessible
         if userDefaultsGroup == nil {
             NSLog("[AppDelegate] Warning: Could not access shared UserDefaults with suite: \(suiteName)")
@@ -50,11 +50,11 @@ class AppDelegate: RCTAppDelegate, UNUserNotificationCenterDelegate {
 
         setupUserDefaultsListener()
         registerNotificationCategories()
-        
+
         // Access the singleton via the class method
         _ = MenuElementsEmitter.sharedInstance()
         NSLog("[MenuElements] AppDelegate: Initialized emitter singleton")
-        
+
         return super.application(application, didFinishLaunchingWithOptions: launchOptions)
     }
 
@@ -98,7 +98,7 @@ class AppDelegate: RCTAppDelegate, UNUserNotificationCenterDelegate {
             NSLog("[AppDelegate] Cannot setup UserDefaults listeners: group defaults not available")
             return
         }
-        
+
         let keys = [
             "WidgetCommunicationAllWalletsSatoshiBalance",
             "WidgetCommunicationAllWalletsLatestTransactionTime",
@@ -207,7 +207,7 @@ class AppDelegate: RCTAppDelegate, UNUserNotificationCenterDelegate {
 
         userDefaultsGroup?.setValue(userActivityData, forKey: "onUserActivityOpen")
 
-        if ["io.bluewallet.bluewallet.receiveonchain", "io.bluewallet.bluewallet.xpub", "io.bluewallet.bluewallet.blockexplorer"].contains(activityType) {
+        if ["org.groestlcoin.bluewallet123.receiveonchain", "org.groestlcoin.bluewallet123.xpub", "org.groestlcoin.bluewallet123.blockexplorer"].contains(activityType) {
           EventEmitter.shared().sendUserActivity(userActivityData)
             return true
         }
@@ -255,20 +255,20 @@ class AppDelegate: RCTAppDelegate, UNUserNotificationCenterDelegate {
         RNCPushNotificationIOS.didReceive(response)
         completionHandler()
     }
-    
+
     // MARK: - Menu Building (macOS Catalyst)
-    
+
     override func buildMenu(with builder: UIMenuBuilder) {
         super.buildMenu(with: builder)
-        
+
         // Remove unnecessary menus
         builder.remove(menu: .services)
         builder.remove(menu: .format)
         builder.remove(menu: .toolbar)
-        
+
         // Remove the original Settings menu item
         builder.remove(menu: .preferences)
-        
+
         // File -> Add Wallet (Command + Shift + A)
         let addWalletCommand = UIKeyCommand(
             title: "Add Wallet",
@@ -276,9 +276,9 @@ class AppDelegate: RCTAppDelegate, UNUserNotificationCenterDelegate {
             input: "A",
             modifierFlags: [.command, .shift]
         )
-        
+
         // All menu items enabled by default
-        
+
         // File -> Import Wallet (Command + I)
         let importWalletCommand = UIKeyCommand(
             title: "Import Wallet",
@@ -286,7 +286,7 @@ class AppDelegate: RCTAppDelegate, UNUserNotificationCenterDelegate {
             input: "I",
             modifierFlags: .command
         )
-        
+
         // Group Add Wallet and Import Wallet in a displayInline menu
         let walletOperationsMenu = UIMenu(
             title: "",
@@ -295,7 +295,7 @@ class AppDelegate: RCTAppDelegate, UNUserNotificationCenterDelegate {
             options: .displayInline,
             children: [addWalletCommand, importWalletCommand]
         )
-        
+
         // Modify the existing File menu to include Wallet Operations
         if let fileMenu = builder.menu(for: .file) {
             // Add "Reload Transactions" (Command + R)
@@ -305,7 +305,7 @@ class AppDelegate: RCTAppDelegate, UNUserNotificationCenterDelegate {
                 input: "R",
                 modifierFlags: .command
             )
-            
+
             // Combine wallet operations and Reload Transactions into the new File menu
             let newFileMenu = UIMenu(
                 title: fileMenu.title,
@@ -314,10 +314,10 @@ class AppDelegate: RCTAppDelegate, UNUserNotificationCenterDelegate {
                 options: fileMenu.options,
                 children: [walletOperationsMenu, reloadTransactionsCommand]
             )
-            
+
             builder.replace(menu: .file, with: newFileMenu)
         }
-        
+
         // BlueWallet -> Settings (Command + ,)
         let settingsCommand = UIKeyCommand(
             title: "Settings...",
@@ -325,7 +325,7 @@ class AppDelegate: RCTAppDelegate, UNUserNotificationCenterDelegate {
             input: ",",
             modifierFlags: .command
         )
-        
+
         let settingsMenu = UIMenu(
             title: "",
             image: nil,
@@ -333,41 +333,41 @@ class AppDelegate: RCTAppDelegate, UNUserNotificationCenterDelegate {
             options: .displayInline,
             children: [settingsCommand]
         )
-        
+
         // Insert the new Settings menu after the About menu
         builder.insertSibling(settingsMenu, afterMenu: .about)
     }
-    
+
     @objc func openSettings(_ keyCommand: UIKeyCommand) {
         DispatchQueue.main.async {
             MenuElementsEmitter.sharedInstance().openSettings()
         }
     }
-    
+
     @objc func addWalletAction(_ keyCommand: UIKeyCommand) {
         DispatchQueue.main.async {
             MenuElementsEmitter.sharedInstance().addWalletMenuAction()
         }
     }
-    
+
     @objc func importWalletAction(_ keyCommand: UIKeyCommand) {
         DispatchQueue.main.async {
             MenuElementsEmitter.sharedInstance().importWalletMenuAction()
         }
     }
-    
+
     @objc func reloadTransactionsAction(_ keyCommand: UIKeyCommand) {
         DispatchQueue.main.async {
             MenuElementsEmitter.sharedInstance().reloadTransactionsMenuAction()
         }
     }
-    
+
     @objc func showHelp(_ sender: Any) {
         if let url = URL(string: "https://bluewallet.io/docs") {
             UIApplication.shared.open(url, options: [:], completionHandler: nil)
         }
     }
-    
+
     override func canPerformAction(_ action: Selector, withSender sender: Any?) -> Bool {
         if action == #selector(showHelp(_:)) {
             return true
