@@ -126,4 +126,26 @@ describe('Segwit P2SH wallet', () => {
     assert.strictEqual(signature, 'KOES8hMhdoZFP0QaMJXTExZPmrTneGfbDmJib7Jt3gTaN0CfsYjBLWRvnDtd9aKlTt8BXxV95PYFOYhdiM1x90w=');
     assert.strictEqual(l.verifyMessage('This is an example of a signed message.', l.getAddress(), signature), true);
   });
+
+  it('can coinselect with different decimal feeRate', async () => {
+    const wallet = new SegwitBech32Wallet();
+    wallet.setSecret('L4vn2KxgMLrEVpxjfLwxfjnPPQMnx42DCjZJ2H7nN4mdHDyEUWXd');
+    const change = wallet.getAddress();
+    const utxos = [
+      {
+        txid: '57d18bc076b919583ff074cfba6201edd577f7fe35f69147ea512e970f95ffeb',
+        vout: 0,
+        value: 100000,
+      },
+    ];
+    for (let feeRate = 1; feeRate < 20; feeRate += 0.1) {
+      wallet.coinselect(utxos, [{ value: 90000, address: '1GX36PGBUrF8XahZEGQqHqnJGW2vCZteoB' }], feeRate);
+      const txNew = wallet.createTransaction(utxos, [{ value: 90000, address: '1GX36PGBUrF8XahZEGQqHqnJGW2vCZteoB' }], feeRate, change);
+      const tx = bitcoin.Transaction.fromHex(txNew.tx.toHex());
+      const actualFeeRate = txNew.fee / tx.virtualSize();
+      const diffPercentage = (Math.abs(actualFeeRate - feeRate) / feeRate) * 100;
+      // check that actual fee rate is not more that 3% different from the expected fee rate
+      assert.ok(diffPercentage < 3, `Fee rate is too different: expected ${feeRate}, got ${actualFeeRate}`);
+    }
+  });
 });

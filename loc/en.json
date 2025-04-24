@@ -172,7 +172,7 @@
     "fee_1d": "3m",
     "fee_3h": "2m",
     "fee_custom": "Custom",
-    "insert_custom_fee": "Insert custom fee",
+    "insert_custom_fee": "Insert fee",
     "fee_fast": "Fast",
     "fee_medium": "Medium",
     "fee_replace_minvb": "The total fee rate (gro per vByte) you want to pay should be higher than {min} gro/vByte.",
