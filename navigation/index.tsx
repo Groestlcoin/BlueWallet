@@ -7,7 +7,6 @@ import { useStorage } from '../hooks/context/useStorage';
 import loc from '../loc';
 import navigationStyle, { CloseButtonPosition } from '../components/navigationStyle';
 import { useTheme } from '../components/themes';
-import ManageWallets from '../screen/wallets/ManageWallets';
 
 // Lazy load all components except UnlockWith
 const DrawerRoot = lazy(() => import('./DrawerRoot'));
@@ -20,7 +19,6 @@ const WalletExportStack = lazy(() => import('./WalletExportStack'));
 const ExportMultisigCoordinationSetupStack = lazy(() => import('./ExportMultisigCoordinationSetupStack'));
 const WalletXpubStackRoot = lazy(() => import('./WalletXpubStack'));
 const SignVerifyStackRoot = lazy(() => import('./SignVerifyStack'));
-const ReceiveDetailsStackRoot = lazy(() => import('./ReceiveDetailsStack'));
 const ScanQRCode = lazy(() => import('../screen/send/ScanQRCode'));
 const ViewEditMultisigCosigners = lazy(() => import('../screen/wallets/ViewEditMultisigCosigners'));
 
@@ -111,12 +109,6 @@ const LazySignVerifyStackRoot = () => (
   </Suspense>
 );
 
-const LazyReceiveDetailsStackRoot = () => (
-  <Suspense fallback={<LazyLoadingIndicator />}>
-    <ReceiveDetailsStackRoot />
-  </Suspense>
-);
-
 const LazyScanQRCodeComponent = () => (
   <Suspense fallback={<LazyLoadingIndicator />}>
     <ScanQRCode />
@@ -172,17 +164,7 @@ const MainRoot = () => {
             component={LazySignVerifyStackRoot}
             options={{ ...NavigationDefaultOptions, ...StatusBarLightOptions }}
           />
-          <DetailViewStack.Screen name="ReceiveDetailsRoot" component={LazyReceiveDetailsStackRoot} options={NavigationDefaultOptions} />
-          <DetailViewStack.Screen
-            name="ManageWallets"
-            component={ManageWallets}
-            options={{
-              presentation: 'fullScreenModal',
-              title: loc.wallets.manage_title,
-              statusBarStyle: 'auto',
-              headerShown: true,
-            }}
-          />
+
           <DetailViewStack.Screen
             name="ScanQRCode"
             component={LazyScanQRCodeComponent}
