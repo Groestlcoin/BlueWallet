@@ -150,6 +150,13 @@ class ElectrumClient {
     }
 
     /**
+     * Log the server details upon successful connection
+     */
+    private fun logServerDetails(server: ElectrumServer) {
+        Log.i(TAG, "Connected to Electrum-GRS server: ${server.host}:${server.port} (SSL: ${server.isSsl})")
+    }
+
+    /**
      * Connect to a specific Electrum-GRS server with network check
      */
     suspend fun connect(
@@ -192,6 +199,7 @@ class ElectrumClient {
                 val responseStr = String(response)
                 Log.d(TAG, "Received server version response: $responseStr")
                 networkStatusListener?.onNetworkStatusChanged(true)
+                logServerDetails(server) // Log server details here
                 result = true
             } else {
                 Log.w(TAG, "Empty response from server when verifying connection")
@@ -315,5 +323,22 @@ class ElectrumClient {
 
         val factory: SSLSocketFactory = sslContext.socketFactory
         return factory.createSocket(host, port) as SSLSocket
+    }
+
+    private fun getNextPeer(): ElectrumServer {
+        val savedPeer = getSavedPeer()
+        return if (savedPeer != null) {
+            Log.d(TAG, "Using saved peer: ${savedPeer.host}:${savedPeer.port} (SSL: ${savedPeer.isSsl})")
+            savedPeer
+        } else {
+            Log.d(TAG, "No saved peer found. Using default hardcoded peers.")
+            hardcodedPeers.random()
+        }
+    }
+
+
+    private fun getSavedPeer(): ElectrumServer? {
+        // implement later
+        return null
     }
 }
