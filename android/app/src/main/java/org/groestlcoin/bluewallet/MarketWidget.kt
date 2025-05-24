@@ -13,7 +13,7 @@ import androidx.work.WorkManager
 import kotlinx.coroutines.delay
 import org.json.JSONObject
 import java.util.concurrent.TimeUnit
-import io.bluewallet.bluewallet.ElectrumClient.ElectrumServer
+import org.groestlcoin.bluewallet.ElectrumClient.ElectrumServer
 
 class MarketWidget : AppWidgetProvider() {
 

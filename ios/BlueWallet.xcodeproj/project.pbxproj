@@ -1369,7 +1369,7 @@
 				INFOPLIST_FILE = BlueWallet/Info.plist;
 				INFOPLIST_KEY_CLKComplicationPrincipalClass = "$(PRODUCT_BUNDLE_IDENTIFIER).ComplicationController";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
-				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = io.bluewallet.bluewallet;
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = org.groestlcoin.bluewallet123;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1426,7 +1426,7 @@
 				INFOPLIST_FILE = BlueWallet/Info.plist;
 				INFOPLIST_KEY_CLKComplicationPrincipalClass = "$(PRODUCT_BUNDLE_IDENTIFIER).ComplicationController";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.finance";
-				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = io.bluewallet.bluewallet;
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = org.groestlcoin.bluewallet123;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1819,10 +1819,10 @@
 				DEVELOPMENT_TEAM = CMG3V3T59A;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				INFOPLIST_FILE = BlueWalletWatch/Info.plist;
-				INFOPLIST_KEY_CLKComplicationPrincipalClass = io.bluewallet.bluewallet.watch.extension.ComplicationController;
+				INFOPLIST_KEY_CLKComplicationPrincipalClass = org.groestlcoin.bluewallet123.watch.extension.ComplicationController;
 				INFOPLIST_KEY_UIMainStoryboardFile = Interface;
 				INFOPLIST_KEY_UIUserInterfaceStyle = Automatic;
-				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = io.bluewallet.bluewallet;
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = org.groestlcoin.bluewallet123;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"@executable_path/Frameworks",
@@ -1876,10 +1876,10 @@
 				DEVELOPMENT_TEAM = CMG3V3T59A;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				INFOPLIST_FILE = BlueWalletWatch/Info.plist;
-				INFOPLIST_KEY_CLKComplicationPrincipalClass = io.bluewallet.bluewallet.watch.extension.ComplicationController;
+				INFOPLIST_KEY_CLKComplicationPrincipalClass = org.groestlcoin.bluewallet123.watch.extension.ComplicationController;
 				INFOPLIST_KEY_UIMainStoryboardFile = Interface;
 				INFOPLIST_KEY_UIUserInterfaceStyle = Automatic;
-				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = io.bluewallet.bluewallet;
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = org.groestlcoin.bluewallet123;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"@executable_path/Frameworks",
