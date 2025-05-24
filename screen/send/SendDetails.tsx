@@ -5,7 +5,7 @@ import { Icon } from '@rneui/themed';
 import assert from 'assert';
 import BigNumber from 'bignumber.js';
 import { TOptions } from 'bip21grs';
-import * as bitcoin from 'Groestlcoinjs-lib';
+import * as bitcoin from 'groestlcoinjs-lib';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
