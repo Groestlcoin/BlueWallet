@@ -1,4 +1,4 @@
-import bitcoin from 'groestlcoinjs-lib';
+import * as bitcoin from 'groestlcoinjs-lib';
 import { CoinSelectOutput, CoinSelectReturnInput, CoinSelectUtxo } from 'coinselect';
 
 import { BitcoinUnit } from '../../models/bitcoinUnits';
