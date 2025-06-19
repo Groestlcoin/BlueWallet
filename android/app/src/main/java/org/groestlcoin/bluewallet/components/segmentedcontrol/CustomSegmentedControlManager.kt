@@ -1,4 +1,4 @@
-package io.bluewallet.bluewallet.components.segmentedcontrol
+package org.groestlcoin.bluewallet.components.segmentedcontrol
 
 import com.facebook.react.bridge.ReadableArray
 import com.facebook.react.common.MapBuilder
@@ -26,7 +26,7 @@ class CustomSegmentedControlManager : SimpleViewManager<CustomSegmentedControl>(
                 array.getString(index) ?: ""
             }
         } ?: emptyArray()
-        
+
         view.values = valuesArray
     }
 
