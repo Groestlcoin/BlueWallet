@@ -389,7 +389,7 @@
     "watchOnlyWarningTitle": "보안 경고",
     "watchOnlyWarningDescription": "사기꾼들은 종종 ‘조회 전용’ 지갑을 사용해 사용자를 속입니다. 이러한 지갑은 자금을 송금하거나 제어할 수 없고 잔액 조회만 가능합니다.",
     "custom_fee_warning_title": "경고",
-    "custom_fee_warning_description": "1 sat/vB 이하의 수수료도 유효하지만, 노드의 정책에 따라 트랜잭션이 릴레이되지 않을 수 있습니다."
+    "custom_fee_warning_description": "1 gro/vB 이하의 수수료도 유효하지만, 노드의 정책에 따라 트랜잭션이 릴레이되지 않을 수 있습니다."
   },
   "wallets": {
     "add_bitcoin": "그로스톨코인코인",
