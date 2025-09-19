@@ -100,7 +100,7 @@ enum FiatUnitEnum: String, AppEnum, CaseIterable, Identifiable, Codable {
         case .DKK:
             return "CoinGecko"
         case .EGP:
-            return "YadioConvert"
+            return "CoinGecko"
         case .EUR:
             return "CoinGecko"
         case .GBP:

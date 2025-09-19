@@ -114,7 +114,7 @@
     "EGP": {
         "endPointKey": "EGP",
         "locale": "ar-EG",
-        "source": "YadioConvert",
+        "source": "CoinGecko",
         "symbol": "ج.م.",
         "country": "Egypt (Egyptian Pound)"
     },
