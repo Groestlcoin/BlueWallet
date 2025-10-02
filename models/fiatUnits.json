@@ -436,7 +436,7 @@
     "GHS": {
         "endPointKey": "GHS",
         "locale": "en-GH",
-        "source": "CoinDesk",
+        "source": "CoinGecko",
         "symbol": "₵",
         "country": "Ghana (Ghanaian Cedi)"
     }
