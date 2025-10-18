@@ -36,21 +36,21 @@ class MainActivity : ReactActivity() {
     override fun onResume() {
         super.onResume()
         Log.d("MainActivity", "MainActivity resumed. Confirming single instance is active.")
-        
+
         // Check if we should show cache cleared alert
         checkAndShowCacheClearedAlert()
     }
-    
+
     private fun checkAndShowCacheClearedAlert() {
-        val sharedPref = getSharedPreferences("group.io.bluewallet.bluewallet", Context.MODE_PRIVATE)
+        val sharedPref = getSharedPreferences("group.org.groestlcoin.bluewallet123", Context.MODE_PRIVATE)
         val shouldShowAlert = sharedPref.getBoolean("shouldShowCacheClearedAlert", false)
-        
+
         if (shouldShowAlert) {
             // Reset the flag
             sharedPref.edit()
                 .putBoolean("shouldShowCacheClearedAlert", false)
                 .apply()
-            
+
             // Show alert after a short delay to ensure UI is ready
             Handler(Looper.getMainLooper()).postDelayed({
                 AlertDialog.Builder(this)
