@@ -1,99 +1,44 @@
-name: Lock Files Update
+name: Lockfile update on package.json change
 
 on:
-  workflow_dispatch:
   push:
-    branches:
-      - master
+    paths:
+      - '**/package.json'   # trigger only when package.json changes
+  workflow_dispatch:        # still useful for manual runs
+
+permissions:
+  contents: write           # required for committing changes
+  pull-requests: write      # required for creating pull requests
 
 jobs:
-  pod-update:
-    runs-on: macos-15
-    permissions:
-      contents: write
+  update-lockfile:
+    runs-on: ubuntu-latest
     steps:
-
-      - name: Checkout master branch
+      - name: Checkout
         uses: actions/checkout@v4
-        with:
-          ref: master  # Ensures we're checking out the master branch
-          fetch-depth: 0 # Ensures full history to enable branch deletion and recreation
 
-      - name: Delete existing branch
-        run: |
-          git push origin --delete pod-update-branch || echo "Branch does not exist, continuing..."
-          git branch -D pod-update-branch || echo "Local branch does not exist, continuing..."
-
-      - name: Create new branch from master
-        run: git checkout -b pod-update-branch  # Create a new branch from the master branch
-
-      - name: Specify node version
+      # If you have a .nvmrc file, you can use 'node-version-file' instead
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 22
-          cache: 'npm'
-          cache-dependency-path: package-lock.json
+          node-version: 'lts/*'      # or: node-version-file: '.nvmrc'
 
-      - name: Install node modules
-        run: npm ci
+      - name: Update lockfile
+        run: |
+          npm i --package-lock-only --ignore-scripts
+          git add package-lock.json
 
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v6
         with:
-          ruby-version: 3.1.6
-          bundler-cache: true
-
-      - name: Install and update Ruby Gems
-        run: |
-          bundle install
-
-      - name: Install CocoaPods Dependencies
-        run: |
-          cd ios
-          pod install
-          pod update
-
-      - name: Check for changes
-        id: check-changes
-        run: |
-          git diff --quiet package-lock.json ios/Podfile.lock || echo "Changes detected"
-        continue-on-error: true
-
-      - name: Stop job if no changes
-        if: steps.check-changes.outcome == 'success'
-        run: |
-          echo "No changes detected in package-lock.json or Podfile.lock. Stopping the job."
-          exit 0
-
-      - name: Commit changes
-        if: steps.check-changes.outcome != 'success'
-        run: |
-          git add package-lock.json ios/Podfile.lock
-          git commit -m "Update lock files"
-
-      # Step 10: Get the list of changed files for PR description
-      - name: Get changed files for PR description
-        id: get-changes
-        if: steps.check-changes.outcome != 'success'
-        run: |
-          git diff --name-only HEAD^ HEAD > changed_files.txt
-          echo "CHANGES=$(cat changed_files.txt)" >> $GITHUB_ENV
-
-      # Step 11: Push the changes and create the PR using the LockFiles PAT
-      - name: Push and create PR
-        if: steps.check-changes.outcome != 'success'
-        run: |
-          git push origin pod-update-branch
-          gh pr create --title "Lock Files Updates" --body "The following lock files were updated:\n\n${{ env.CHANGES }}" --base master
-        env:
-          GITHUB_TOKEN: ${{ secrets.LOCKFILES_WORKFLOW }} # Use the LockFiles PAT for PR creation
-
-  cleanup:
-    runs-on: macos-15
-    if: github.event.pull_request.merged == true || github.event.pull_request.state == 'closed'
-    needs: pod-update
-    steps:
-
-      - name: Delete branch after PR merge/close
-        run: |
-          git push origin --delete pod-update-branch
+          commit-message: "chore(lockfile): update package-lock.json via CI"
+          title: "chore(lockfile): update lockfile"
+          body: |
+            Automated update of `package-lock.json` after changes to `package.json`.
+          branch: "ci/update-lockfile-${{ github.sha }}"
+          delete-branch: true
+          add-paths: |
+            package-lock.json
+          labels: |
+            dependencies
+            automated pr
