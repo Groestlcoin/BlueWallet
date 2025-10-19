@@ -17,7 +17,7 @@ sed -i'.original' "s/versionCode 1/versionCode $BUILD_NUMBER/g" app/build.gradle
 # Extract versionName from build.gradle
 VERSION_NAME=$(grep versionName app/build.gradle | awk '{print $2}' | tr -d '"')
 
-./gradlew assembleRelease
+./gradlew assembleRelease --stacktrace
 
 # Rename the APK file to include the dynamic version and build number with parentheses
 mv ./app/build/outputs/apk/release/app-release-unsigned.apk "./app/build/outputs/apk/release/BlueWallet-${VERSION_NAME}($BUILD_NUMBER).apk"
