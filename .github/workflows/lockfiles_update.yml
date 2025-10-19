@@ -4,37 +4,45 @@ on:
   push:
     paths:
       - '**/package.json'   # trigger only when package.json changes
-  workflow_dispatch:        # still useful for manual runs
+  workflow_dispatch:        # optional manual trigger
 
 permissions:
   contents: write           # required for committing changes
-  pull-requests: write      # required for creating pull requests
+  pull-requests: write      # required for creating PRs
 
 jobs:
   update-lockfile:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04   # pin to Ubuntu 24.04
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # If you have a .nvmrc file, you can use 'node-version-file' instead
-      - name: Setup Node.js
+      - name: Setup Node.js 20.19.5
         uses: actions/setup-node@v4
         with:
-          node-version: 'lts/*'      # or: node-version-file: '.nvmrc'
+          node-version: '20.19.5'
 
-      - name: Update lockfile
+      - name: Use npm 10.8.2
         run: |
-          npm i --package-lock-only --ignore-scripts
+          npm --version
+          npm i -g npm@10.8.2
+          npm --version
+        # Tip: update npm AFTER setup-node and without sudo. :contentReference[oaicite:1]{index=1}
+
+      - name: Update lockfile only
+        run: |
+          npm i --package-lock-only --lockfile-version 3 --ignore-scripts
           git add package-lock.json
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v6
         with:
-          commit-message: "chore(lockfile): update package-lock.json via CI"
+          commit-message: "chore(lockfile): update package-lock.json (Node 20.19.5 / npm 10.8.2)"
           title: "chore(lockfile): update lockfile"
           body: |
             Automated update of `package-lock.json` after changes to `package.json`.
+            Environment: Ubuntu 24.04, Node 20.19.5, npm 10.8.2.
           branch: "ci/update-lockfile-${{ github.sha }}"
           delete-branch: true
           add-paths: |
