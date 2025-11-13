@@ -19,7 +19,7 @@
     },
     {
         "description": "Standard BIP86 native taproot",
-        "derivation_path": "m/86'/0'/0'",
+        "derivation_path": "m/86'/17'/0'",
         "script_type": "p2tr",
         "iterate_accounts": false
     }

@@ -41,10 +41,10 @@ describe('Taproot HD (BIP86)', () => {
 
     assert.ok(hd.getAllExternalAddresses().includes('bc1p5cyxnuxmeuwuvkwfem96lqzszd02n6xdcjrs20cac6yqjjwudpxqkedrcr'));
 
-    assert.strictEqual(hd._getDerivationPathByAddress(hd._getExternalAddressByIndex(0)), "m/86'/0'/0'/0/0");
-    assert.strictEqual(hd._getDerivationPathByAddress(hd._getExternalAddressByIndex(1)), "m/86'/0'/0'/0/1");
-    assert.strictEqual(hd._getDerivationPathByAddress(hd._getInternalAddressByIndex(0)), "m/86'/0'/0'/1/0");
-    assert.strictEqual(hd._getDerivationPathByAddress(hd._getInternalAddressByIndex(1)), "m/86'/0'/0'/1/1");
+    assert.strictEqual(hd._getDerivationPathByAddress(hd._getExternalAddressByIndex(0)), "m/86'/17'/0'/0/0");
+    assert.strictEqual(hd._getDerivationPathByAddress(hd._getExternalAddressByIndex(1)), "m/86'/17'/0'/0/1");
+    assert.strictEqual(hd._getDerivationPathByAddress(hd._getInternalAddressByIndex(0)), "m/86'/17'/0'/1/0");
+    assert.strictEqual(hd._getDerivationPathByAddress(hd._getInternalAddressByIndex(1)), "m/86'/17'/0'/1/1");
 
     assert.strictEqual(hd.getMasterFingerprintHex(), '73C5DA0A');
 

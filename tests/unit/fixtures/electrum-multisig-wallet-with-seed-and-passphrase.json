@@ -94,7 +94,7 @@
         "xpub": "Zpub6yVcJzRPEwQAjC2GsJSqZJTZAhf7VM6PGdin9jFTQ6zUia3aFtdn9WzXEZBk1AcgSgQ7kLcysk5CWTuJppjFKdYJDMYVT9hZF71PyPijNUF"
     },
     "x2/": {
-        "derivation": "m/48'/0'/0'/2'",
+        "derivation": "m/48'/17'/0'/2'",
         "pw_hash_version": 1,
         "root_fingerprint": "84431270",
         "type": "bip32",

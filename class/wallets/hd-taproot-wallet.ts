@@ -1,8 +1,8 @@
-import BIP32Factory, { BIP32Interface } from 'bip32';
+import BIP32Factory, { BIP32Interface } from 'bip32grs';
 import { AbstractHDElectrumWallet } from './abstract-hd-electrum-wallet';
 import ecc from '../../blue_modules/noble_ecc';
-import * as bitcoin from 'bitcoinjs-lib';
-import { Psbt } from 'bitcoinjs-lib';
+import * as bitcoin from 'groestlcoinjs-lib';
+import { Psbt } from 'groestlcoinjs-lib';
 import { CoinSelectReturnInput } from 'coinselect';
 
 const bip32 = BIP32Factory(ecc);
@@ -18,7 +18,7 @@ export class HDTaprootWallet extends AbstractHDElectrumWallet {
   // @ts-ignore: override
   public readonly typeReadable = HDTaprootWallet.typeReadable;
   public readonly segwitType = 'p2tr';
-  static readonly derivationPath = "m/86'/0'/0'";
+  static readonly derivationPath = "m/86'/17'/0'";
 
   getXpub() {
     if (this._xpub) {

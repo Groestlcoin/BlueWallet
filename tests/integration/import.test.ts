@@ -537,7 +537,7 @@ describe('import procedure', () => {
     );
     await promise;
     assert.strictEqual(store.state.wallets[0].type, WatchOnlyWallet.type);
-    assert.strictEqual(store.state.wallets[0].getDerivationPath(), "m/84'/0'/0'");
+    assert.strictEqual(store.state.wallets[0].getDerivationPath(), "m/84'/17'/0'");
     assert.strictEqual(
       store.state.wallets[0].getSecret(),
       'zpub6qoWjSiZRHzSYPGYJ6EzxEXJXP1b2Rj9syWwJZFNCmupMwkbSAWSBk3UvSkJyQLEhQpaBAwvhmNj3HPKpwCJiTBB9Tutt46FtEmjL2DoU3J',
@@ -619,7 +619,7 @@ describe('import procedure', () => {
     assert.strictEqual(store.state.wallets.length, 1);
     assert.strictEqual(store.state.wallets[0].type, WatchOnlyWallet.type);
     assert.strictEqual(store.state.wallets[0].getMasterFingerprintHex(), '086ee178');
-    assert.strictEqual(store.state.wallets[0].getDerivationPath(), "m/84'/0'/0'");
+    assert.strictEqual(store.state.wallets[0].getDerivationPath(), "m/84'/17'/0'");
     assert.strictEqual(store.state.wallets[0]._getExternalAddressByIndex(0), 'bc1q5y4r767v5fzx74ez4nw36hjqrhr4ayeyut5px6');
   });
 
@@ -637,7 +637,7 @@ describe('import procedure', () => {
     assert.strictEqual(store.state.wallets.length, 1);
     assert.strictEqual(store.state.wallets[0].type, WatchOnlyWallet.type);
     assert.strictEqual(store.state.wallets[0].getMasterFingerprintHex(), '086ee178');
-    assert.strictEqual(store.state.wallets[0].getDerivationPath(), "m/84'/0'/0'");
+    assert.strictEqual(store.state.wallets[0].getDerivationPath(), "m/84'/17'/0'");
     assert.strictEqual(store.state.wallets[0]._getExternalAddressByIndex(0), 'bc1q5y4r767v5fzx74ez4nw36hjqrhr4ayeyut5px6');
   });
 
@@ -655,7 +655,7 @@ describe('import procedure', () => {
     assert.strictEqual(store.state.wallets.length, 1);
     assert.strictEqual(store.state.wallets[0].type, WatchOnlyWallet.type);
     assert.strictEqual(store.state.wallets[0].getMasterFingerprintHex(), '086ee178');
-    assert.strictEqual(store.state.wallets[0].getDerivationPath(), "m/84'/0'/0'");
+    assert.strictEqual(store.state.wallets[0].getDerivationPath(), "m/84'/17'/0'");
     assert.strictEqual(store.state.wallets[0]._getExternalAddressByIndex(0), 'bc1q5y4r767v5fzx74ez4nw36hjqrhr4ayeyut5px6');
   });
 });

@@ -194,7 +194,7 @@ describe('Watch only wallet', () => {
     );
     assert.strictEqual(w.getMasterFingerprint(), 1150645398);
     assert.strictEqual(w.getMasterFingerprintHex(), '96749544');
-    assert.strictEqual(w.getDerivationPath(), "m/84'/0'/0'");
+    assert.strictEqual(w.getDerivationPath(), "m/84'/17'/0'");
     assert.ok(w.useWithHardwareWalletEnabled());
   });
 
@@ -330,7 +330,7 @@ describe('Watch only wallet', () => {
 
     assert.strictEqual(w.getMasterFingerprintHex(), 'dafedf1c');
     assert.strictEqual(w.getMasterFingerprint(), 484441818);
-    assert.strictEqual(w.getDerivationPath(), "m/84'/0'/0'");
+    assert.strictEqual(w.getDerivationPath(), "m/84'/17'/0'");
 
     assert.strictEqual(
       w.getSecret(),
@@ -359,7 +359,7 @@ describe('Watch only wallet', () => {
     assert.ok(w.valid());
 
     assert.strictEqual(w.getMasterFingerprintHex(), '3c7f1a52');
-    assert.strictEqual(w.getDerivationPath(), "m/84'/0'/0'");
+    assert.strictEqual(w.getDerivationPath(), "m/84'/17'/0'");
 
     assert.strictEqual(w._getExternalAddressByIndex(0), 'bc1qr0y5c96xtfeulnzxnjl086f2njcmf8qmhenvpp');
 
@@ -383,7 +383,7 @@ describe('Watch only wallet', () => {
       assert.ok(w.valid());
 
       assert.strictEqual(w.getMasterFingerprintHex(), '97311f91');
-      assert.strictEqual(w.getDerivationPath(), "m/86'/0'/0'");
+      assert.strictEqual(w.getDerivationPath(), "m/86'/17'/0'");
 
       assert.strictEqual(
         w.getSecret(),
@@ -554,7 +554,7 @@ describe('BC-UR', () => {
     // these Zpubs are still in Bitcoin format since the above text data was not changed
     assert.strictEqual(
       b.toString('ascii'),
-      "# CoboVault Multisig setup file (created on D37EAD88)\n#\nName: CV_33B5B91A_2-2\nPolicy: 2 of 2\nDerivation: m/48'/0'/0'/2'\nFormat: P2WSH\n\nD37EAD88: Zpub74ijpfhERJNjhCKXRspTdLJV5eoEmSRZdHqDvp9kVtdVEyiXk7pXxRbfZzQvsDFpfDHEHVtVpx4Dz9DGUWGn2Xk5zG5u45QTMsYS2vjohNQ\n168DD603: Zpub75mAE8EjyxSzoyPmGnd5E6MyD7ALGNndruWv52xpzimZQKukwvEfXTHqmH8nbbc6ccP5t2aM3mws3pKYSnKpKMMytdbNEZFUxKzztYFM8Pn\n",
+      "# CoboVault Multisig setup file (created on D37EAD88)\n#\nName: CV_33B5B91A_2-2\nPolicy: 2 of 2\nDerivation: m/48'/17'/0'/2'\nFormat: P2WSH\n\nD37EAD88: Zpub74ijpfhERJNjhCKXRspTdLJV5eoEmSRZdHqDvp9kVtdVEyiXk7pXxRbfZzQvsDFpfDHEHVtVpx4Dz9DGUWGn2Xk5zG5u45QTMsYS2vjohNQ\n168DD603: Zpub75mAE8EjyxSzoyPmGnd5E6MyD7ALGNndruWv52xpzimZQKukwvEfXTHqmH8nbbc6ccP5t2aM3mws3pKYSnKpKMMytdbNEZFUxKzztYFM8Pn\n",
     );
   });
 
@@ -570,7 +570,7 @@ describe('BC-UR', () => {
 
     assert.strictEqual(
       Buffer.from(decoded, 'hex').toString('ascii'),
-      '{"ExtPubKey":"zpub6qT7amLcp2exr4mU4AhXZMjD9CFkopECVhUxc9LHW8pNsJG2B9ogs5sFbGZpxEeT5TBjLmc7EFYgZA9EeWEM1xkJMFLefzZc8eigREDQF9H","MasterFingerprint":"01EBDA7D","AccountKeyPath":"m/84\'/0\'/0\'"}',
+      '{"ExtPubKey":"zpub6qT7amLcp2exr4mU4AhXZMjD9CFkopECVhUxc9LHW8pNsJG2B9ogs5sFbGZpxEeT5TBjLmc7EFYgZA9EeWEM1xkJMFLefzZc8eigREDQF9H","MasterFingerprint":"01EBDA7D","AccountKeyPath":"m/84\'/17\'/0\'"}',
     );
 
     const w = new WatchOnlyWallet();

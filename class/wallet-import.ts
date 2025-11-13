@@ -32,7 +32,7 @@ export const validateBip32 = (path: string) => path.match(/^(m\/)?(\d+'?\/)*\d+'
 // because original file bip39WalletFormatsElectrum is from Electrum X and doesn't contain p2tr wallets, we need to add it
 bip39WalletFormatsElectrum.push({
   description: 'Standard BIP86 native taproot',
-  derivation_path: "m/86'/0'/0'",
+  derivation_path: "m/86'/17'/0'",
   script_type: 'p2tr',
   iterate_accounts: true,
 });

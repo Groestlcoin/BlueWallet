@@ -20,7 +20,7 @@ const txtFileFormatMultisigWrappedSegwit =
 const txtFileFormatMultisigNativeSegwit =
   'UR:BYTES/TYQHKGEQGDHKYM6KV96KCAPQF46KCARFWD5KWGRNV4682UPQVE5KCEFQ9P3HYETPW3JKGGR0DCSYGVEHG4Q5GWPC9Y9ZXZJWV9KK2W3QGDT97VENGG65YWF3G90NYTFJPFGX7MRFVDUN5GPJYPHKVGPJPFZX2UNFWESHG6T0DCAZQMF0XSUZWTESYUHNQFE0XGNS53N0WFKKZAP6YPGRY46NFQ9Q53PNXAZ5Z3PC8QAZQKNSW43RWDRFDFCXV6Z92F9YU6NGGD94S5NNWP2XGNZ22C6K2M69D4F4YKNYFPC5GANS8944VARY2EZHJ62CDVMHQKRC2F3XVKN629M8X3ZXWPNYGJZ9FPT8G4NS0Q6YG73EG3R42468DCE9S6E40FRN2AF5X4G4GNTNT9FNYAN2DA5YU5G2XYMRS3ZYXCCRXW3QTFC82C3HX4K5Z3FCG448J7ZN0FHHJ5RDGAHXGD29XEXHJ3PHG9XYWNNWV3E824MKX5E8SUR6D9K4552TW44HWAJ9VEV9GJR3D4YRSMNZVF3NVCMR2Q6HGVNPF5EK6AMNXDCYKK2NDE9HQJ6DF4UHGERZFEZ453J40P9H57N5T9RY6WZSDC9QWZ5LU2';
 const coldcardExport =
-  '{"p2sh_deriv":"m/45\'","p2sh":"xpub6847W6cYUqq4ixcmFb83iqPtJZfnMPTkpYiCsuUybzFppJp2qzh3KCVHsLGQy4WhaxGqkK9aDDZnSfhB92PkHDKihbH6WLztzmN7Wa6g3Mx","p2wsh_p2sh_deriv":"m/48\'/0\'/0\'/1\'","p2wsh_p2sh":"Ypub6kvtvTZpqGuWtQfg9bL5xe4vDWtwsirR8LzDvsY3vgXvyncW1NGXCUJ9Ps7CiizSSLV6NnnXSYyVDnxCu26QChWzWLg5YCAHam6cYjGtzRz","p2wsh_deriv":"m/48\'/0\'/0\'/2\'","p2wsh":"Zpub75mAE8EjyxSzoyPmGnd5E6MyD7ALGNndruWv52xpzimZQKukwvEfXTHqmH8nbbc6ccP5t2aM3mws3pKYSnKpKMMytdbNEZFUxKzztbAMePj","xfp":"168DD603"}';
+  '{"p2sh_deriv":"m/45\'","p2sh":"xpub6847W6cYUqq4ixcmFb83iqPtJZfnMPTkpYiCsuUybzFppJp2qzh3KCVHsLGQy4WhaxGqkK9aDDZnSfhB92PkHDKihbH6WLztzmN7Wa6g3Mx","p2wsh_p2sh_deriv":"m/48\'/17\'/0\'/1\'","p2wsh_p2sh":"Ypub6kvtvTZpqGuWtQfg9bL5xe4vDWtwsirR8LzDvsY3vgXvyncW1NGXCUJ9Ps7CiizSSLV6NnnXSYyVDnxCu26QChWzWLg5YCAHam6cYjGtzRz","p2wsh_deriv":"m/48\'/0\'/0\'/2\'","p2wsh":"Zpub75mAE8EjyxSzoyPmGnd5E6MyD7ALGNndruWv52xpzimZQKukwvEfXTHqmH8nbbc6ccP5t2aM3mws3pKYSnKpKMMytdbNEZFUxKzztbAMePj","xfp":"168DD603"}';
 const electumJson =
   '{"x2/": {"xpub": "Zpub75mAE8EjyxSzoyPmGnd5E6MyD7ALGNndruWv52xpzimZQKukwvEfXTHqmH8nbbc6ccP5t2aM3mws3pKYSnKpKMMytdbNEZFUxKzztbAMePj", "hw_type": "coldcard", "ckcc_xfp": 64392470, "label": "Coldcard", "derivation": "m/48\'/1\'/0\'/1\'", "type": "hardware"}, "x1/": {"xpub": "Zpub74ijpfhERJNjhCKXRspTdLJV5eoEmSRZdHqDvp9kVtdVEyiXk7pXxRbfZzQvsDFpfDHEHVtVpx4Dz9DGUWGn2Xk5zG5u45QTMsYS2vgHaNW", "hw_type": "coldcard", "ckcc_xfp": 2293071571, "label": "Coldcard", "derivation": "m/48\'/1\'/0\'/1\'", "type": "hardware"}, "wallet_type": "2of2", "use_encryption": false, "seed_version": 17}';
 
@@ -1082,7 +1082,7 @@ describe('multisig-wallet (native segwit)', () => {
     wallet.setSecret(
       'Name: Multisig Vault\n' +
         'Policy: 2 of 2\n' +
-        "Derivation: m/48'/0'/0'/2'\n" +
+        "Derivation: m/48'/17'/0'/2'\n" +
         'Format: P2WSH\n' +
         '\n' +
         '00000000: Zpub6yjw2xcmSY3uD1KbYLnrSuP2PaxDXajA1YymjzstkZCGnBX3Z1oC6dVFtA1TQNPoTaguixnjYfRK3edDDoP3xxJZSSv1S9NrG5zqK5YzKHE\n' +
@@ -1428,7 +1428,7 @@ describe('multisig-wallet (native segwit)', () => {
     assert.ok(!w.isLegacy());
 
     assert.strictEqual(w.getCustomDerivationPathForCosigner(1), "m/1'");
-    assert.strictEqual(w.getCustomDerivationPathForCosigner(2), "m/48'/0'/0'/2'");
+    assert.strictEqual(w.getCustomDerivationPathForCosigner(2), "m/48'/17'/0'/2'");
 
     assert.strictEqual(w.getFingerprint(1), '8de7b2c3'.toUpperCase());
     assert.strictEqual(w.getFingerprint(2), '84431270'.toUpperCase());
@@ -2122,7 +2122,7 @@ describe('multisig-cosigner', () => {
       cosigner.getXpub(),
       'Zpub756tPxxwHiYkYiT12G2WUD2cpAHyVWhjvKPbXoY5jDZSyo71yG5C14LCuwhycTTAzgTUcQfddR8FFTQ1bSWR6kzmNbMEaVzUrj4LhtCjMqy',
     );
-    assert.strictEqual(cosigner.getPath(), "m/48'/0'/0'/2'");
+    assert.strictEqual(cosigner.getPath(), "m/48'/17'/0'/2'");
     assert.strictEqual(cosigner.howManyCosignersWeHave(), 1);
     assert.strictEqual(cosigner.getFp(), '01EBDA7D');
   });
@@ -2255,13 +2255,13 @@ describe('multisig-cosigner', () => {
   });
 
   it('can export to json', () => {
-    const result = MultisigCosigner.exportToJson(fp1cobo, Zpub1, "m/48'/0'/0'/2'");
+    const result = MultisigCosigner.exportToJson(fp1cobo, Zpub1, "m/48'/17'/0'/2'");
     assert.strictEqual(
       result,
-      '{"xfp":"D37EAD88","xpub":"Zpub74ijpfhERJNjhCKXRspTdLJV5eoEmSRZdHqDvp9kVtdVEyiXk7pXxRbfZzQvsDFpfDHEHVtVpx4Dz9DGUWGn2Xk5zG5u45QTMsYS2vgHaNW","path":"m/48\'/0\'/0\'/2\'"}',
+      '{"xfp":"D37EAD88","xpub":"Zpub74ijpfhERJNjhCKXRspTdLJV5eoEmSRZdHqDvp9kVtdVEyiXk7pXxRbfZzQvsDFpfDHEHVtVpx4Dz9DGUWGn2Xk5zG5u45QTMsYS2vgHaNW","path":"m/48\'/17\'/0\'/2\'"}',
     );
 
-    const cosigner = new MultisigCosigner(MultisigCosigner.exportToJson(fp1cobo, Zpub1, "m/48'/0'/0'/2'"));
+    const cosigner = new MultisigCosigner(MultisigCosigner.exportToJson(fp1cobo, Zpub1, "m/48'/17'/0'/2'"));
     assert.strictEqual(cosigner.getFp(), 'D37EAD88');
     assert.strictEqual(
       cosigner.getXpub(),
@@ -2288,7 +2288,7 @@ describe('multisig-cosigner', () => {
   });
 
   it('can export cosigner to URv2', () => {
-    let result = encodeUR(MultisigCosigner.exportToJson(fp1cobo, Zpub1, "m/48'/0'/0'/2'"));
+    let result = encodeUR(MultisigCosigner.exportToJson(fp1cobo, Zpub1, "m/48'/17'/0'/2'"));
     assert.deepStrictEqual(result, [
       'ur:crypto-account/oeadcytekbpmloaolytaadmetaaddloxaxhdclaofejnolgudllagdgodyweehzsmeyasnswrpdalnwzfenbmewlrtplsklbjkvdloweaahdcxltjzjpctayfsimuogtpypffrnlisflswwzntbecabtbdwdbstojnfrahdamnpfcyamtaaddyotadlocsdyykaeykaeykaoykaocytekbpmloaxaaaycyghykhpcmkgnstevs',
     ]);
@@ -2297,7 +2297,7 @@ describe('multisig-cosigner', () => {
       MultisigCosigner.exportToJson(
         '42A2460E',
         'Ypub6m2WhkZvujztfZVYWEB4Hfcq3mKfeZYMfZj2wfvgNmTDjcCncU9ua6VSxXno7FeF8P2kqp1S7N8UoYapR8YKnMLNq8bEDDd2PU6q7Nhqr2K',
-        "m/48'/0'/0'/1'",
+        "m/48'/17'/0'/1'",
       ),
     );
     assert.deepStrictEqual(result, [
