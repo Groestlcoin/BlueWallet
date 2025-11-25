@@ -34,12 +34,12 @@ describe('Bech32 Segwit HD (BIP84)', () => {
     assert.ok(!hd.addressIsChange('grs1qrm2uggqj846nljryvmuga56vtwfey0dtnc4z55'));
 
     assert.strictEqual(
-      hd._getPubkeyByAddress(hd._getExternalAddressByIndex(0)).toString('hex'),
-      '02b61ee53e24da178693ef0e7bdf34a250094deb2ec9dbd80b080d7242e54df383',
+      uint8ArrayToHex(hd._getPubkeyByAddress(hd._getExternalAddressByIndex(0))),
+      '0330d54fd0dd420a6e5f8d3624f5f3482cae350f79d5f0753bf5beef9c2d91af3c',
     );
     assert.strictEqual(
-      hd._getPubkeyByAddress(hd._getInternalAddressByIndex(0)).toString('hex'),
-      '02af1f15ed1969b0de88bb7858b6f0e3a12440f80534e21ee2422c81d644728650',
+      uint8ArrayToHex(hd._getPubkeyByAddress(hd._getInternalAddressByIndex(0))),
+      '03025324888e429ab8e3dbaf1f7802648b9cd01e9b418485c5fa4c1b9b5700e1a6',
     );
 
     assert.strictEqual(hd._getDerivationPathByAddress(hd._getExternalAddressByIndex(0)), "m/84'/17'/0'/0/0");

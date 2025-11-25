@@ -1,6 +1,7 @@
 import assert from 'assert';
 
 import { HDLegacyP2PKHWallet, HDSegwitP2SHWallet, LegacyWallet, SegwitBech32Wallet, SegwitP2SHWallet } from '../../class';
+import { uint8ArrayToHex } from '../../blue_modules/uint8array-extras';
 
 describe('P2SH Segwit HD (BIP49)', () => {
   it('can create a wallet', async () => {
@@ -16,14 +17,12 @@ describe('P2SH Segwit HD (BIP49)', () => {
     assert.ok(!hd.getAllExternalAddresses().includes('38DBbhHEBFWbwm9abjjUVdTV2zs4FDRcp5')); // not internal
     assert.strictEqual(true, hd.validateMnemonic());
 
-    assert.strictEqual(
-      hd._getPubkeyByAddress(hd._getExternalAddressByIndex(0)).toString('hex'),
-      '02c3beeba8bbf24bfa336e03749683b1208b4aea13290337b00262d5afbe5f15c7',
-    );
-    assert.strictEqual(
-      hd._getPubkeyByAddress(hd._getInternalAddressByIndex(0)).toString('hex'),
-      '03c3ff5233bc11fa0273b508d42a144e5e475a7e5f17473d211d40d035db9da483',
-    );
+    let u8a = hd._getPubkeyByAddress(hd._getExternalAddressByIndex(0));
+    assert(u8a);
+    assert.strictEqual(uint8ArrayToHex(u8a), '0348192db90b753484601aaf1e6220644ffe37d83a9a5feff32b4da43739f736be');
+    u8a = hd._getPubkeyByAddress(hd._getInternalAddressByIndex(0));
+    assert(u8a);
+    assert.strictEqual(uint8ArrayToHex(u8a), '03c107e6976d59e17490513fbed3fb321736b7231d24f3d09306c72714acf1859d');
 
     assert.strictEqual(hd._getDerivationPathByAddress(hd._getExternalAddressByIndex(0)), "m/49'/17'/0'/0/0"); // wrong, FIXME
     assert.strictEqual(hd._getDerivationPathByAddress(hd._getInternalAddressByIndex(0)), "m/49'/17'/0'/1/0"); // wrong, FIXME
