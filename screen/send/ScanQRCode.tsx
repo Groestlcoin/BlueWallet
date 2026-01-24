@@ -1,7 +1,7 @@
 import { RouteProp, StackActions, useIsFocused, useRoute } from '@react-navigation/native';
 import * as bitcoin from 'groestlcoinjs-lib';
 import { sha256 } from '@noble/hashes/sha256';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Platform, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native';
 import Base43 from '../../blue_modules/base43';
 import * as fs from '../../blue_modules/fs';
@@ -73,6 +73,7 @@ const ScanQRCode = () => {
   const [urHave, setUrHave] = useState(0);
   const [backdoorText, setBackdoorText] = useState('');
   const [backdoorVisible, setBackdoorVisible] = useState(false);
+  const useBBQRRef = useRef(false);
   const [animatedQRCodeData, setAnimatedQRCodeData] = useState<Record<string, string>>({});
   const [cameraStatusGranted, setCameraStatusGranted] = useState<boolean | undefined>(undefined);
   const stylesHook = StyleSheet.create({
@@ -107,7 +108,7 @@ const ScanQRCode = () => {
           const merge = true;
           const popToAction = StackActions.popTo(launchedBy, { onBarScanned: data }, { merge });
           if (onBarScanned) {
-            onBarScanned(data);
+            onBarScanned(data, useBBQRRef.current);
           }
 
           navigation.dispatch(popToAction);
@@ -146,7 +147,7 @@ const ScanQRCode = () => {
           const merge = true;
           const popToAction = StackActions.popTo(launchedBy, { onBarScanned: data }, { merge });
           if (onBarScanned) {
-            onBarScanned(data);
+            onBarScanned(data, useBBQRRef.current);
           }
 
           navigation.dispatch(popToAction);
@@ -179,6 +180,11 @@ const ScanQRCode = () => {
       return _onReadUniformResourceV2(ret.data);
     }
 
+    if (ret.data.toUpperCase().startsWith('B$')) {
+      useBBQRRef.current = true;
+      return _onReadUniformResourceV2(ret.data);
+    }
+
     if (ret.data.toUpperCase().startsWith('UR:BYTES')) {
       const splitted = ret.data.split('/');
       if (splitted.length === 3 && splitted[1].includes('-')) {
@@ -200,7 +206,7 @@ const ScanQRCode = () => {
         const merge = true;
         const popToAction = StackActions.popTo(launchedBy, { onBarScanned: data }, { merge });
         if (onBarScanned) {
-          onBarScanned(data);
+          onBarScanned(data, useBBQRRef.current);
         }
         navigation.dispatch(popToAction);
       }
@@ -213,7 +219,7 @@ const ScanQRCode = () => {
 
           const popToAction = StackActions.popTo(launchedBy, { onBarScanned: ret.data }, { merge });
           if (onBarScanned) {
-            onBarScanned(ret.data);
+            onBarScanned(ret.data, useBBQRRef.current);
           }
 
           navigation.dispatch(popToAction);
