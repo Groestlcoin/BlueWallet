@@ -1,7 +1,7 @@
 import assert from 'assert';
 import { joinQRs, splitQRs } from '../../blue_modules/bbqr/main';
 import { base64ToUint8Array, uint8ArrayToBase64, uint8ArrayToString } from '../../blue_modules/uint8array-extras';
-import * as bitcoin from 'bitcoinjs-lib';
+import * as bitcoin from 'groestlcoinjs-lib';
 import { BlueURDecoder } from '../../blue_modules/ur';
 
 const walletExportParts = [
