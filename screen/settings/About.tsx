@@ -92,10 +92,6 @@ const About: React.FC = () => {
   }, []);
 
   const handleOnTelegramPress = useCallback(() => {
-    Linking.openURL('https://discord.gg/vCKxQBz');
-  }, []);
-
-  const handleOnTelegramPress = useCallback(() => {
     Linking.openURL('https://t.me/groestl');
   }, []);
 
