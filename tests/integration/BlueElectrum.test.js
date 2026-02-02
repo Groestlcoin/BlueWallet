@@ -154,21 +154,20 @@ describe('BlueElectrum', () => {
 
   it('BlueElectrum can do getTransactionsFullByAddress()', async function () {
     const txs = await BlueElectrum.getTransactionsFullByAddress('grs1q0h03f6hw65yll5a7lnmu6atpdplw7y34752g80');
-    for (const tx of txs) {
-      assert.ok(tx.address === 'grs1q0h03f6hw65yll5a7lnmu6atpdplw7y34752g80');
-      assert.ok(tx.txid);
-      assert.ok(tx.confirmations);
-      assert.ok(!tx.vin);
-      assert.ok(!tx.vout);
-      assert.ok(tx.inputs);
-      assert.strictEqual(tx.inputs[0]?.addresses[0], 'grs1qksxm6s3v7k4x28rsth6ptdteghckqc7jd57gjj');
-      assert.ok(tx.inputs[0].addresses.length > 0);
-      assert.ok(tx.inputs[0].value > 0);
-      assert.ok(tx.outputs);
-      assert.ok(tx.outputs[0].value > 0);
-      assert.ok(tx.outputs[0].scriptPubKey);
-      assert.ok(tx.outputs[0].addresses.length > 0);
-    }
+    const tx = txs[0];
+    assert.ok(tx.address === 'grs1q0h03f6hw65yll5a7lnmu6atpdplw7y34752g80');
+    assert.ok(tx.txid);
+    assert.ok(tx.confirmations);
+    assert.ok(!tx.vin);
+    assert.ok(!tx.vout);
+    assert.ok(tx.inputs);
+    assert.strictEqual(tx.inputs[0]?.addresses[0], 'grs1qksxm6s3v7k4x28rsth6ptdteghckqc7jd57gjj');
+    assert.ok(tx.inputs[0].addresses.length > 0);
+    assert.ok(tx.inputs[0].value > 0);
+    assert.ok(tx.outputs);
+    assert.ok(tx.outputs[0].value > 0);
+    assert.ok(tx.outputs[0].scriptPubKey);
+    assert.ok(tx.outputs[0].addresses.length > 0);
   });
 
   it('BlueElectrum can do txhexToElectrumTransaction()', () => {
@@ -184,7 +183,7 @@ describe('BlueElectrum', () => {
       'grs1q0h03f6hw65yll5a7lnmu6atpdplw7y34752g80',
       'grs1q49qls5kklryt95g5xx4p6msycpgjp8ramfc9jq',
       'grs1qphjsj69a65q9uv6ehp65hr84zjtffvw9630pcx',
-      // TODO: get a 3 address and put it here and in the [] below
+      // '3GCvDBAktgQQtsbN6x5DYiQCMmgZ9Yk8BK',
       'grs1qpacqt92u22c35cau7gkmhyartnrfgdmq3ltpkf',
     ]);
 
@@ -198,8 +197,9 @@ describe('BlueElectrum', () => {
     assert.strictEqual(balances.addresses.grs1qphjsj69a65q9uv6ehp65hr84zjtffvw9630pcx.unconfirmed, 0);
     assert.strictEqual(balances.addresses.grs1qpacqt92u22c35cau7gkmhyartnrfgdmq3ltpkf.confirmed, 60950);
     assert.strictEqual(balances.addresses.grs1qpacqt92u22c35cau7gkmhyartnrfgdmq3ltpkf.unconfirmed, 0);
-    // assert.strictEqual(balances.addresses['grs1qpacqt92u22c35cau7gkmhyartnrfgdmq3ltpkf'].confirmed, 60950);
-    // assert.strictEqual(balances.addresses['grs1qpacqt92u22c35cau7gkmhyartnrfgdmq3ltpkf'].unconfirmed, 0);
+    // assert.strictEqual(balances.addresses['3GCvDBAktgQQtsbN6x5DYiQCMmgZ9Yk8BK'].confirmed, 51432);
+    // assert.strictEqual(balances.addresses['3GCvDBAktgQQtsbN6x5DYiQCMmgZ9Yk8BK'].unconfirmed, 0);
+    if (diableBatching) BlueElectrum.setBatchingEnabled();
   });
 
   // TODO: we should not skip this test

@@ -2,9 +2,8 @@ import BIP32Factory from 'bip32grs';
 import bip38 from 'bip38grs';
 import * as bip39 from 'bip39';
 import * as bitcoin from 'groestlcoinjs-lib';
-import React, { Component, useMemo } from 'react';
-import { Linking, StyleSheet, View, Platform, StatusBar } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import React, { Component } from 'react';
+import { Linking, StyleSheet, View } from 'react-native';
 // @ts-ignore theres no type declaration for this
 import BlueCrypto from 'react-native-blue-crypto';
 import wif from 'wifgrs';
@@ -32,7 +31,7 @@ import { CreateTransactionUtxo } from '../../class/wallets/types';
 import { BlueSpacing20 } from '../../components/BlueSpacing';
 import { BlueLoading } from '../../components/BlueLoading';
 import { LightningArkWallet } from '../../class/wallets/lightning-ark-wallet';
-import SafeAreaScrollView from '../../components/SafeAreaScrollView';
+import { SettingsCard, SettingsScrollView } from '../../components/platform';
 
 const bip32 = BIP32Factory(ecc);
 
@@ -298,9 +297,9 @@ export default class SelfTest extends Component {
         //
 
         const hd4 = new HDSegwitBech32Wallet();
-        hd4._xpub = 'zpub6r7jhKKm7BAVx3b3nSnuadY1WnshZYkhK8gKFoRLwK9rF3Mzv28BrGcCGA3ugGtawi1WLb2vyjQAX9ZTDGU5gNk2bLdTc3iEXr6tzR1ipNP';
+        hd4._xpub = 'zpub6rnbAtzupLPpSrsBKRsHupFvv1h6pwfRnZxX3qs6RL4LiLqKQ6kfBaDckn2apQWfyw1D2TdQMMDCfUDHMwtrcbGoy88xoKBLmADTFK9AhLe';
         await hd4.fetchBalance();
-        if (hd4.getBalance() !== 200000) throw new Error('Could not fetch HD Bech32 balance');
+        if (hd4.getBalance() !== 2400) throw new Error('Could not fetch HD Bech32 balance');
         await hd4.fetchTransactions();
         if (hd4.getTransactions().length !== 4) throw new Error('Could not fetch HD Bech32 transactions');
       } else {
@@ -373,51 +372,43 @@ export default class SelfTest extends Component {
 }
 
 const SelfTestContent: React.FC<{ state: TState; onPressImportDocument: () => void }> = ({ state, onPressImportDocument }) => {
-  const insets = useSafeAreaInsets();
-
-  // Calculate header height for Android with transparent header
-  const headerHeight = useMemo(() => {
-    if (Platform.OS === 'android' && insets.top > 0) {
-      return 56 + (StatusBar.currentHeight || insets.top);
-    }
-    return 0;
-  }, [insets.top]);
-
   return (
-    <SafeAreaScrollView headerHeight={headerHeight} automaticallyAdjustContentInsets contentInsetAdjustmentBehavior="automatic">
-      <BlueSpacing20 />
+    <SettingsScrollView automaticallyAdjustContentInsets contentInsetAdjustmentBehavior="automatic">
+      <SettingsCard>
+        <BlueSpacing20 />
 
-      {state.isLoading ? (
-        <BlueLoading testID="SelfTestLoading" />
-      ) : (
-        (() => {
-          if (state.isOk) {
-            return (
-              <View style={styles.center}>
-                <BlueText testID="SelfTestOk" h4>
-                  OK
-                </BlueText>
-                <BlueSpacing20 />
-                <BlueText>{loc.settings.about_selftest_ok}</BlueText>
-              </View>
-            );
-          } else {
-            return (
-              <View style={styles.center}>
-                <BlueText h4 numberOfLines={0}>
-                  {state.errorMessage}
-                </BlueText>
-              </View>
-            );
-          }
-        })()
-      )}
-      <BlueSpacing20 />
-      <SaveFileButton fileName="bluewallet-selftest.txt" fileContent={'Success on ' + new Date().toUTCString()}>
-        <Button title="Test Save to Storage" />
-      </SaveFileButton>
-      <BlueSpacing20 />
-      <Button title="Test File Import" onPress={onPressImportDocument} />
-    </SafeAreaScrollView>
+        {state.isLoading ? (
+          <BlueLoading testID="SelfTestLoading" />
+        ) : (
+          (() => {
+            if (state.isOk) {
+              return (
+                <View style={styles.center}>
+                  <BlueText testID="SelfTestOk" h4>
+                    OK
+                  </BlueText>
+                  <BlueSpacing20 />
+                  <BlueText>{loc.settings.about_selftest_ok}</BlueText>
+                </View>
+              );
+            } else {
+              return (
+                <View style={styles.center}>
+                  <BlueText h4 numberOfLines={0}>
+                    {state.errorMessage}
+                  </BlueText>
+                </View>
+              );
+            }
+          })()
+        )}
+        <BlueSpacing20 />
+        <SaveFileButton fileName="bluewallet-selftest.txt" fileContent={'Success on ' + new Date().toUTCString()}>
+          <Button title="Test Save to Storage" />
+        </SaveFileButton>
+        <BlueSpacing20 />
+        <Button title="Test File Import" onPress={onPressImportDocument} />
+      </SettingsCard>
+    </SettingsScrollView>
   );
 };

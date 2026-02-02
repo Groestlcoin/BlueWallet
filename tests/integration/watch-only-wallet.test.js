@@ -85,9 +85,9 @@ describe('Watch only wallet', () => {
 
   it.skip('can fetch balance & transactions from zpub HD', async () => {
     const w = new WatchOnlyWallet();
-    w.setSecret('zpub6r7jhKKm7BAVx3b3nSnuadY1WnshZYkhK8gKFoRLwK9rF3Mzv28BrGcCGA3ugGtawi1WLb2vyjQAX9ZTDGU5gNk2bLdTc3iEXr6tzR1ipNP');
+    w.setSecret('zpub6rnbAtzupLPpSrsBKRsHupFvv1h6pwfRnZxX3qs6RL4LiLqKQ6kfBaDckn2apQWfyw1D2TdQMMDCfUDHMwtrcbGoy88xoKBLmADTFK9AhLe');
     await w.fetchBalance();
-    assert.strictEqual(w.getBalance(), 200000);
+    assert.strictEqual(w.getBalance(), 2400);
     await w.fetchTransactions();
     assert.strictEqual(w.getTransactions().length, 4);
     const nextAddress = await w.getAddressAsync();
