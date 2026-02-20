@@ -47,5 +47,6 @@ describe('multisig-hd-wallet', () => {
     await w.fetchTransactions();
     // this wallet has no transactions, so we won't check the number
     // assert.ok(w.getTransactions().length >= 6);
+    // assert.strictEqual(w.getBalance(), 108880);
   });
 });

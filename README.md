@@ -1,7 +1,6 @@
 # GRS BlueWallet - A Groestlcoin & Lightning Wallet
 
 [![GitHub tag](https://img.shields.io/badge/dynamic/json.svg?url=https://raw.githubusercontent.com/Groestlcoin/BlueWallet/master/package.json&query=$.version&label=Version)](https://github.com/Groestlcoin/BlueWallet)
-[![CircleCI](https://circleci.com/gh/Groestlcoin/BlueWallet.svg?style=svg)](https://circleci.com/gh/Groestlcoin/BlueWallet)
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
 ![](https://img.shields.io/github/license/Groestlcoin/BlueWallet.svg)
 
