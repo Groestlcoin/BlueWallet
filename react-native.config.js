@@ -8,7 +8,7 @@ module.exports = {
     type: 'all',
     jsSrcsDir: './codegen',
     android: {
-      javaPackageName: 'io.bluewallet.bluewallet',
+      javaPackageName: 'org.groestlcoin.bluewallet123',
     },
   },
 };
