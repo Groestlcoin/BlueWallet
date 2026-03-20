@@ -57,7 +57,7 @@ describe('BlueWallet UI Tests - import Watch-only wallet (zpub)', () => {
       await element(by.text(`No, and do not ask me again.`)).tap();
       await element(by.text(`No, and do not ask me again.`)).tap(); // sometimes the first click doesnt work (detox issue, not app's)
     } catch (_) {}
-    await expect(element(by.id('BitcoinAddressQRCodeContainer'))).toBeVisible();
+    await expect(element(by.id('BitcoinAddressQRCode'))).toBeVisible();
     await expect(element(by.text('grs1q5vzs7ea3z5e2wt53mp97mfy927eu75l7tdf0nq'))).toBeVisible();
     await element(by.id('SetCustomAmountButton')).tap();
     await element(by.id('BitcoinAmountInput')).replaceText('1');
@@ -68,7 +68,7 @@ describe('BlueWallet UI Tests - import Watch-only wallet (zpub)', () => {
     await expect(element(by.id('CustomAmountDescriptionText'))).toHaveText('Test');
     await expect(element(by.id('BitcoinAmountText'))).toHaveText('1 GRS');
 
-    await expect(element(by.id('BitcoinAddressQRCodeContainer'))).toBeVisible();
+    await expect(element(by.id('BitcoinAddressQRCode'))).toBeVisible();
 
     await expect(element(by.text('groestlcoin:GRS1QC8WUN6LF9VCAJPDDTGDPD2PDRP0KWP29J6UPGV?amount=1&label=Test'))).toBeVisible();
     await goBack();

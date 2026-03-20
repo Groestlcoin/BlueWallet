@@ -3,13 +3,30 @@ on: [push, pull_request]
 
 jobs:
   buildReleaseApk:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
       - name: Checkout project
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
           fetch-depth: "0"
+
+      - name: Free disk space (Android build)
+        shell: bash
+        run: |
+          df -h
+          sudo rm -rf /usr/share/dotnet || true
+          sudo rm -rf /opt/ghc || true
+          sudo rm -rf /usr/local/share/boost || true
+          sudo rm -rf /usr/local/lib/android/sdk/ndk || true
+          docker system prune -af || true
+          sudo rm -rf /usr/local/lib/android/sdk/system-images || true
+          sudo rm -rf /usr/local/lib/android/sdk/emulator || true
+          rm -rf ~/.gradle/caches/modules-2/files-2.1 || true
+          rm -rf ~/.gradle/caches/build-cache || true
+          rm -rf ~/.npm/_cacache ~/.cache || true
+          sudo rm -rf /home/runner/work/_temp || true
+          df -h
 
       - name: Specify node version
         uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6
@@ -25,8 +42,16 @@ jobs:
           java-version: '17'
           cache: 'gradle'
 
-      - name: Install node_modules
-        run: npm ci --omit=dev --yes
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android SDK components
+        run: |
+          yes | sdkmanager --licenses
+          sdkmanager "platforms;android-36" "platform-tools" "build-tools;36.0.0" "ndk;27.1.12297006"
+
+      - name: Install node_modules (include dev deps for patch-package)
+        run: npm ci --yes
 
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
