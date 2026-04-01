@@ -97,7 +97,7 @@ MIT
 
 ## Translations
 
-We accept translations via [Transifex](https://www.transifex.com/bluewallet/bluewallet/)
+We accept translations via [Transifex](https://explore.transifex.com/bluewallet/bluewallet/)
 
 To participate you need to:
 1. Sign up to Transifex
