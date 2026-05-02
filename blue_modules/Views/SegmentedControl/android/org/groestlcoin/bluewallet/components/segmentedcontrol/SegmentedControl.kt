@@ -134,11 +134,7 @@ class SegmentedControl @JvmOverloads constructor(
             val bgColorStateList = ColorStateList(
                 arrayOf(
                     intArrayOf(android.R.attr.state_checked),
-<<<<<<<< HEAD:android/app/src/main/java/org/groestlcoin/bluewallet/components/segmentedcontrol/CustomSegmentedControl.kt
-                    intArrayOf(-android.R.attr.state_checked)
-========
                     intArrayOf(-android.R.attr.state_checked),
->>>>>>>> upstream/master:blue_modules/Views/SegmentedControl/android/io/bluewallet/bluewallet/components/segmentedcontrol/SegmentedControl.kt
                 ),
                 intArrayOf(selectedBgColor, unselectedBgColor),
             )
@@ -146,11 +142,7 @@ class SegmentedControl @JvmOverloads constructor(
             val textColorStateList = ColorStateList(
                 arrayOf(
                     intArrayOf(android.R.attr.state_checked),
-<<<<<<<< HEAD:android/app/src/main/java/org/groestlcoin/bluewallet/components/segmentedcontrol/CustomSegmentedControl.kt
-                    intArrayOf(-android.R.attr.state_checked)
-========
                     intArrayOf(-android.R.attr.state_checked),
->>>>>>>> upstream/master:blue_modules/Views/SegmentedControl/android/io/bluewallet/bluewallet/components/segmentedcontrol/SegmentedControl.kt
                 ),
                 intArrayOf(selectedTextColor, unselectedTextColor),
             )
@@ -158,11 +150,7 @@ class SegmentedControl @JvmOverloads constructor(
             val strokeColorStateList = ColorStateList(
                 arrayOf(
                     intArrayOf(android.R.attr.state_checked),
-<<<<<<<< HEAD:android/app/src/main/java/org/groestlcoin/bluewallet/components/segmentedcontrol/CustomSegmentedControl.kt
-                    intArrayOf(-android.R.attr.state_checked)
-========
                     intArrayOf(-android.R.attr.state_checked),
->>>>>>>> upstream/master:blue_modules/Views/SegmentedControl/android/io/bluewallet/bluewallet/components/segmentedcontrol/SegmentedControl.kt
                 ),
                 intArrayOf(borderColor, borderColor),
             )
@@ -170,11 +158,7 @@ class SegmentedControl @JvmOverloads constructor(
             val rippleColorStateList = ColorStateList(
                 arrayOf(
                     intArrayOf(android.R.attr.state_checked),
-<<<<<<<< HEAD:android/app/src/main/java/org/groestlcoin/bluewallet/components/segmentedcontrol/CustomSegmentedControl.kt
-                    intArrayOf(-android.R.attr.state_checked)
-========
                     intArrayOf(-android.R.attr.state_checked),
->>>>>>>> upstream/master:blue_modules/Views/SegmentedControl/android/io/bluewallet/bluewallet/components/segmentedcontrol/SegmentedControl.kt
                 ),
                 intArrayOf(rippleColorSelected, rippleColor),
             )
