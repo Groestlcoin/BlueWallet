@@ -15,8 +15,8 @@ import Button from '../../components/Button';
 import CopyTextToClipboard from '../../components/CopyTextToClipboard';
 import HandOffComponent from '../../components/HandOffComponent';
 import HeaderMenuButton from '../../components/HeaderMenuButton';
-import QRCodeComponent from '../../components/QRCodeComponent';
-import SegmentedControl from '../../components/SegmentControl';
+import QRCode from '../../components/QRCode';
+import SegmentedControl from '../../components/SegmentedControl';
 import { useTheme } from '../../components/themes';
 import TipBox from '../../components/TipBox';
 import { TransactionPendingIconBig } from '../../components/TransactionPendingIconBig';
@@ -383,7 +383,7 @@ const ReceiveDetails = () => {
                 </>
               )}
               <View style={styles.qrCodeContainer}>
-                <QRCodeComponent value={bip21encoded} size={qrCodeSize} />
+                <QRCode value={bip21encoded} size={qrCodeSize} />
               </View>
               <CopyTextToClipboard text={isCustom ? bip21encoded : address} isAddress={true} />
             </View>
@@ -400,7 +400,7 @@ const ReceiveDetails = () => {
             <>
               <TipBox description={loc.receive.bip47_explanation} containerStyle={styles.tip} />
               <View style={styles.qrCodeContainer}>
-                <QRCodeComponent value={qrValue} size={qrCodeSize} />
+                <QRCode value={qrValue} size={qrCodeSize} />
               </View>
               <CopyTextToClipboard text={qrValue} truncated={false} />
             </>
