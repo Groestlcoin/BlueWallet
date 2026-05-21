@@ -111,7 +111,7 @@ Transifex automatically creates Pull Request when language reaches 100% translat
 
 ### Vocabulary glossaries
 
-[`loc/vocabulary.md`](loc/vocabulary.md) + the per-language files under [`loc/vocabulary/`](loc/vocabulary/) are the canonical glossary of Bitcoin/Lightning terms (Wallet, Vault, Seed, Mnemonic, Passphrase, Multisig, Payment Code, Coin Control, …) and their chosen rendering in each locale, with the reasoning behind each choice and ⚠️ anti-meaning callouts (e.g. Passcode ≠ Password, Change-output ≠ verb "to change"). Use them as ground truth when translating by hand or when feeding `loc/<lang>.json` to an LLM — terminology consistency across screens is the difference between "looks translated" and "is correct for a Bitcoin wallet". When you change a shipped string, update the matching row in the same PR.
+[`loc/vocabulary.md`](loc/vocabulary.md) + the per-language files under [`loc/vocabulary/`](loc/vocabulary/) are the canonical glossary of Groestlcoin/Lightning terms (Wallet, Vault, Seed, Mnemonic, Passphrase, Multisig, Payment Code, Coin Control, …) and their chosen rendering in each locale, with the reasoning behind each choice and ⚠️ anti-meaning callouts (e.g. Passcode ≠ Password, Change-output ≠ verb "to change"). Use them as ground truth when translating by hand or when feeding `loc/<lang>.json` to an LLM — terminology consistency across screens is the difference between "looks translated" and "is correct for a Groestlcoin wallet". When you change a shipped string, update the matching row in the same PR.
 
 ## Q&A
 
