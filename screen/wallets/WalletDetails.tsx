@@ -1,9 +1,10 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, LayoutAnimation, StyleSheet, Switch, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, Switch, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { writeFileAndExport } from '../../blue_modules/fs';
 import triggerHapticFeedback, { HapticFeedbackTypes } from '../../blue_modules/hapticFeedback';
 import { uint8ArrayToHex } from '../../blue_modules/uint8array-extras';
-import { BlueCard, BlueText } from '../../BlueComponents';
+import BlueCard from '../../components/BlueCard';
+import BlueText from '../../components/BlueText';
 import { HDAezeedWallet } from '../../class/wallets/hd-aezeed-wallet';
 import { HDSegwitBech32Wallet } from '../../class/wallets/hd-segwit-bech32-wallet';
 import { LegacyWallet } from '../../class/wallets/legacy-wallet';
@@ -420,7 +421,6 @@ const WalletDetails: React.FC = () => {
   });
 
   const onViewMasterFingerPrintPress = () => {
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setIsMasterFingerPrintVisible(true);
   };
 

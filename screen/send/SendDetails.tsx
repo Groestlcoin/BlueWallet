@@ -14,7 +14,6 @@ import {
   findNodeHandle,
   FlatList,
   Keyboard,
-  LayoutAnimation,
   NativeScrollEvent,
   NativeSyntheticEvent,
   Platform,
@@ -29,7 +28,7 @@ import RNFS from 'react-native-fs';
 import { btcToSatoshi, fiatToBTC } from '../../blue_modules/currency';
 import * as fs from '../../blue_modules/fs';
 import triggerHapticFeedback, { HapticFeedbackTypes } from '../../blue_modules/hapticFeedback';
-import { BlueText } from '../../BlueComponents';
+import BlueText from '../../components/BlueText';
 import { HDSegwitBech32Wallet } from '../../class/wallets/hd-segwit-bech32-wallet';
 import { MultisigHDWallet } from '../../class/wallets/multisig-hd-wallet';
 import { WatchOnlyWallet } from '../../class/wallets/watch-only-wallet';
@@ -1328,7 +1327,6 @@ const SendDetails = () => {
             number={utxos.length}
             onContainerPress={handleCoinControl}
             onClose={() => {
-              LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
               setParams({ utxos: null });
             }}
           />
