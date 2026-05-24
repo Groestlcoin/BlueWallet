@@ -19,7 +19,7 @@ beforeAll(async () => {
 describe('Watch only wallet', () => {
   it('can fetch balance', async () => {
     const w = new WatchOnlyWallet();
-    w.setSecret('3E2p6qP9vh4hFfuVQLsxTAziRDDHJ5DnQj');
+    w.setSecret('12cbQLTFMXRnSzktFkuoG3eHoMeFtpTu3S');
     await w.fetchBalance();
     assert.ok(w.getBalance() > 16);
   });
