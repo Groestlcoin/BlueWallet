@@ -315,6 +315,7 @@ export class AbstractHDWallet extends LegacyWallet {
     throw new Error('Not implemented');
   }
 
+  // GRS check if this needs to be (node: 17 | 1)
   _getNodePubkeyByIndex(node: 0 | 1, index: number): Uint8Array | undefined {
     throw new Error('Not implemented');
   }
