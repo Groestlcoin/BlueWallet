@@ -11,7 +11,7 @@ import presentAlert from '../../components/Alert';
 import { FButton, FContainer, FloatButtonsBottomFade } from '../../components/FloatButtons';
 import { useTheme } from '../../components/themes';
 import { TransactionListItem } from '../../components/TransactionListItem';
-import WalletsCarousel, { getWalletCarouselItemWidth } from '../../components/WalletsCarousel';
+import WalletsCarousel, { getWalletCarouselItemWidth, CarouselListRefType } from '../../components/WalletsCarousel';
 import { useSizeClass, SizeClass } from '../../blue_modules/sizeClass';
 import loc from '../../loc';
 import ActionSheet from '../ActionSheet';
@@ -25,6 +25,7 @@ import { useSettings } from '../../hooks/context/useSettings';
 import useMenuElements from '../../hooks/useMenuElements';
 import SafeAreaSectionList from '../../components/SafeAreaSectionList';
 import { scanQrHelper } from '../../helpers/scan-qr';
+import { isIOS26OrHigher } from '../../components/platform';
 
 const WalletsListSections = { CAROUSEL: 'CAROUSEL', TRANSACTIONS: 'TRANSACTIONS' };
 
@@ -101,7 +102,7 @@ const WalletsList: React.FC = () => {
   const [state, dispatch] = useReducer(reducer, initialState);
   const { isLoading } = state;
   const { sizeClass, isLarge } = useSizeClass();
-  const walletsCarousel = useRef<any>(null);
+  const walletsCarousel = useRef<CarouselListRefType>(null);
   const connectionPoll = useContext(ConnectionPollContext);
   const currentWalletIndex = useRef<number>(0);
   const { registerTransactionsHandler, unregisterTransactionsHandler } = useMenuElements();
@@ -471,7 +472,9 @@ const WalletsList: React.FC = () => {
 
   const sectionListKeyExtractor = useCallback((item: any, index: any) => {
     if (typeof item === 'string') return item;
-    return item?.hash || item?.txid || `${item}${index}`;
+    const txKey = item?.hash || item?.txid;
+    if (txKey && item?.walletID) return `${txKey}_${item.walletID}`;
+    return txKey || `${item}${index}`;
   }, []);
 
   const refreshProps = isDesktop || isElectrumDisabled ? {} : { refreshing: isLoading, onRefresh };
@@ -552,6 +555,8 @@ const WalletsList: React.FC = () => {
         updateCellsBatchingPeriod={50}
         getItemLayout={getItemLayout}
         ignoreTopInset={true} // Ignore top inset as the screen header already handles it
+        // On iOS 26+, let the section headers scroll naturally with the content rather than sticking
+        stickySectionHeadersEnabled={!isIOS26OrHigher}
         {...refreshProps}
       />
       {renderScanButton()}
