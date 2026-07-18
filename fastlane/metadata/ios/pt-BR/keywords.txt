@@ -1,1 +1,1 @@
-groestlcoin,carteira,carteira groestlcoin,blockchain,grs,criptomoeda,groestlcoin,groestlcoin samourai,electrum-grs,ethereum
+bitcoin,carteira,carteira bitcoin,blockchain,btc,criptomoeda,lightning,segwit,multisig,electrum

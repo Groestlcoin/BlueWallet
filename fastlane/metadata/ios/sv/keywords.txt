@@ -1,1 +1,1 @@
-groestlcoin,wallet,segwit,crypto,blockchain,grs,cryptocurrency,wallet,bread,groestlcoin samourai,lightning,ethereum
+bitcoin,plånbok,bitcoin-plånbok,blockkedja,btc,kryptovaluta,lightning,segwit,multisig,electrum

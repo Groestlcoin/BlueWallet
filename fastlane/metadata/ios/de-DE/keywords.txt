@@ -1,1 +1,1 @@
-Groestlcoin,Wallet,Groestlcoin Wallet,Blockchain,GRS,Kryptowährung,Groestlcoin Kaufen,groestlcoin samourai,Electrum-grs
+Bitcoin,Wallet,Bitcoin Wallet,Blockchain,BTC,Kryptowährung,Lightning,SegWit,Multisig,Electrum

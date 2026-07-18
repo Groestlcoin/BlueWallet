@@ -1,1 +1,1 @@
-groestlcoin,cartera,blockchain,grs,criptomoneda,comprar,groestlcoin samourai,electrum-grs,ethereum,moneda
+bitcoin,cartera,cartera bitcoin,blockchain,btc,criptomoneda,lightning,segwit,multifirma,electrum

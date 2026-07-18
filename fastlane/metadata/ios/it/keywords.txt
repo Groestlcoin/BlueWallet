@@ -1,1 +1,1 @@
-groestlcoin,wallet,groestlcoin wallet,blockchain,grs,cryptocurrency,acquista groestlcoin,electrum-grs,crypto-valuta
+bitcoin,portafoglio,portafoglio bitcoin,blockchain,btc,crypto,lightning,segwit,multisig,electrum
