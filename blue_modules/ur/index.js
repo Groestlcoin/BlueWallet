@@ -351,13 +351,13 @@ function _hdKeyToResult(hdKey, masterFingerprintOverride) {
 
   // Re-encode with the correct version bytes for the specific script type so that
   // BlueWallet can recognise the wallet type from the prefix alone (xpub/ypub/zpub).
-  if (derivationPath.startsWith("m/49'/0'/")) {
+  if (derivationPath.startsWith("m/49'/17'/")) {
     // BIP-49 P2SH-P2WPKH → ypub (version 0x049d7cb2)
     let d = b58.decode(result.ExtPubKey);
     d = d.slice(4);
     result.ExtPubKey = b58.encode(concatUint8Arrays([hexToUint8Array('049d7cb2'), d]));
   }
-  if (derivationPath.startsWith("m/44'/0'/")) {
+  if (derivationPath.startsWith("m/44'/17'/")) {
     // BIP-44 P2PKH → xpub (version 0x0488b21e)
     let d = b58.decode(result.ExtPubKey);
     d = d.slice(4);
