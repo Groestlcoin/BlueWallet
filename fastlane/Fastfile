@@ -2,8 +2,6 @@
 def app_identifiers
   [
     "org.groestlcoin.bluewallet123",
-    "org.groestlcoin.bluewallet123.watch",
-    "org.groestlcoin.bluewallet123.watch.extension",
     "org.groestlcoin.bluewallet123.Stickers",
     "org.groestlcoin.bluewallet123.MarketWidget"
   ]

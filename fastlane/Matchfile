@@ -10,8 +10,6 @@ type(ENV["MATCH_TYPE"] || "appstore")
 # App identifiers for all BlueWallet apps
 app_identifier([
   "org.groestlcoin.bluewallet123",
-  "org.groestlcoin.bluewallet123.watch",
-  "org.groestlcoin.bluewallet123.watch.extension",
   "org.groestlcoin.bluewallet123.Stickers",
   "org.groestlcoin.bluewallet123.MarketWidget"
 ])

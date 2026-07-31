@@ -20,10 +20,6 @@
       <dict>
           <key>org.groestlcoin.bluewallet123</key>
           <string>match AppStore org.groestlcoin.bluewallet123</string>
-          <key>org.groestlcoin.bluewallet123.watch</key>
-          <string>match AppStore org.groestlcoin.bluewallet123.watch</string>
-          <key>org.groestlcoin.bluewallet123watch.extension</key>
-          <string>match AppStore org.groestlcoin.bluewallet123.watch.extension</string>
           <key>org.groestlcoin.bluewallet123.Stickers</key>
           <string>match AppStore org.groestlcoin.bluewallet123.Stickers</string>
           <key>org.groestlcoin.bluewallet123.MarketWidget</key>
