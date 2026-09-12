@@ -11,7 +11,8 @@ type(ENV["MATCH_TYPE"] || "appstore")
 app_identifier([
   "org.groestlcoin.bluewallet123",
   "org.groestlcoin.bluewallet123.Stickers",
-  "org.groestlcoin.bluewallet123.MarketWidget"
+  "org.groestlcoin.bluewallet123.MarketWidget",
+  "org.groestlcoin.bluewallet123.BIP329QuickLookPreview"
 ])
 
 # Your Apple Developer account email address
