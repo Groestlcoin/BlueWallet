@@ -12,7 +12,8 @@ app_identifier([
   "org.groestlcoin.bluewallet123",
   "org.groestlcoin.bluewallet123.Stickers",
   "org.groestlcoin.bluewallet123.MarketWidget",
-  "org.groestlcoin.bluewallet123.BIP329QuickLookPreview"
+  "org.groestlcoin.bluewallet123.QuickLookPreview",
+  "org.groestlcoin.bluewallet123.QuickLookThumbnail"
 ])
 
 # Your Apple Developer account email address

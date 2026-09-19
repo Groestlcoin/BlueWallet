@@ -24,8 +24,10 @@
           <string>match AppStore org.groestlcoin.bluewallet123.Stickers</string>
           <key>org.groestlcoin.bluewallet123.MarketWidget</key>
           <string>match AppStore org.groestlcoin.bluewallet123.MarketWidget</string>
-          <key>org.groestlcoin.bluewallet123.BIP329QuickLookPreview</key>
-          <string>match AppStore org.groestlcoin.bluewallet123.BIP329QuickLookPreview</string>
+          <key>org.groestlcoin.bluewallet123.QuickLookPreview</key>
+          <string>match AppStore org.groestlcoin.bluewallet123.QuickLookPreview</string>
+          <key>org.groestlcoin.bluewallet123.QuickLookThumbnail</key>
+          <string>match AppStore org.groestlcoin.bluewallet123.QuickLookThumbnail</string>
       </dict>
   </dict>
 </plist>
