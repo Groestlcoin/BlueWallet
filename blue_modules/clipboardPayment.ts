@@ -1,7 +1,7 @@
 import { sha256 } from '@noble/hashes/sha256';
 import { bech32 } from 'bech32';
-import * as bitcoin from 'bitcoinjs-lib';
-import bolt11 from 'bolt11';
+import * as bitcoin from 'groestlcoinjs-lib';
+import bolt11 from 'bolt11grs';
 
 import { ContactList } from '../class/contact-list';
 import DeeplinkSchemaMatch from '../class/deeplink-schema-match';

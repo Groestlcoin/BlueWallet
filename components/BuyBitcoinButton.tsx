@@ -6,7 +6,7 @@ import { Chain } from '../models/bitcoinUnits';
 import { useTheme } from './themes';
 
 /** MoonPay publishable key. Safe to ship in the client. */
-export const MOONPAY_API_KEY = 'pk_live_IkhSI2lIXSiolwakfd95QFD4p3908cZa';
+export const MOONPAY_API_KEY = 'pk_live_';
 
 /** Matches ReceiveDetails: don't wait on a full gap-limit Electrum scan before showing an address. */
 export const BUY_BITCOIN_ADDRESS_TIMEOUT_MS = 1000;
