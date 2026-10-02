@@ -127,8 +127,36 @@ describe.each(['', '//'])('unit - DeepLinkSchemaMatch', function (suffix) {
         expected: ['SendDetailsRoot', { screen: 'SendDetails', params: { uri: 'FWp7bfoFEfczt1pVQrQddqVXBN9hPvUYqs' } }],
       },
       {
-        argument: { url: 'groestlcoin:${suffix}FWp7bfoFEfczt1pVQrQddqVXBN9hPvUYqs' },
-        expected: ['SendDetailsRoot', { screen: 'SendDetails', params: { uri: 'groestlcoin:FWp7bfoFEfczt1pVQrQddqVXBN9hPvUYqs' } }],
+        argument: {
+          url: 'sp1qqgste7k9hx0qftg6qmwlkqtwuy6cycyavzmzj85c6qdfhjdpdjtdgqjuexzk6murw56suy3e0rd2cgqvycxttddwsvgxe2usfpxumr70xc9pkqwv',
+        },
+        expected: [
+          'SendDetailsRoot',
+          {
+            screen: 'SendDetails',
+            params: {
+              uri: 'sp1qqgste7k9hx0qftg6qmwlkqtwuy6cycyavzmzj85c6qdfhjdpdjtdgqjuexzk6murw56suy3e0rd2cgqvycxttddwsvgxe2usfpxumr70xc9pkqwv',
+            },
+          },
+        ],
+      },
+      {
+        argument: {
+          url: 'PM8TJS2JxQ5ztXUpBBRnpTbcUXbUHy2T1abfrb3KkAAtMEGNbey4oumH7Hc578WgQJhPjBxteQ5GHHToTYHE3A1w6p7tU6KSoFmWBVbFGjKPisZDbP97',
+        },
+        expected: [
+          'SendDetailsRoot',
+          {
+            screen: 'SendDetails',
+            params: {
+              uri: 'PM8TJS2JxQ5ztXUpBBRnpTbcUXbUHy2T1abfrb3KkAAtMEGNbey4oumH7Hc578WgQJhPjBxteQ5GHHToTYHE3A1w6p7tU6KSoFmWBVbFGjKPisZDbP97',
+            },
+          },
+        ],
+      },
+      {
+        argument: { url: `groestlcoin:${suffix}12eQ9m4sgAwTSQoNXkRABKhCXCsjm2jdVG` },
+        expected: ['SendDetailsRoot', { screen: 'SendDetails', params: { uri: 'groestlcoin:12eQ9m4sgAwTSQoNXkRABKhCXCsjm2jdVG' } }],
       },
       {
         argument: { url: 'GROESTLCOIN:${suffix}GRS1Q44JTK2QL0XTGJPDWRYSZWC7W8TSW30HP6YCT3X?amount=666&label=Yo' },
