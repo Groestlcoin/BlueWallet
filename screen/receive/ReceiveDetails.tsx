@@ -271,7 +271,8 @@ const ReceiveDetails = () => {
           newAddress = wallet.getAddress();
         }
       } else {
-        saveToDisk(); // caching whatever getAddressAsync() generated internally
+        // caching whatever getAddressAsync() generated internally
+        saveToDisk().catch((error: unknown) => console.warn('ReceiveDetails: saveToDisk failed', error));
       }
     } else {
       try {
@@ -284,7 +285,8 @@ const ReceiveDetails = () => {
         console.warn('either sleep expired or getAddressAsync threw an exception');
         newAddress = wallet.getAddress();
       } else {
-        saveToDisk(); // caching whatever getAddressAsync() generated internally
+        // caching whatever getAddressAsync() generated internally
+        saveToDisk().catch((error: unknown) => console.warn('ReceiveDetails: saveToDisk failed', error));
       }
     }
 

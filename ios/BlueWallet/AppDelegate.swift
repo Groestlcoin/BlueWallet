@@ -323,7 +323,7 @@ class AppDelegate: RCTAppDelegate, UNUserNotificationCenterDelegate {
         userDefaultsGroup?.setValue(userActivityData, forKey: "onUserActivityOpen")
 
         if ["org.groestlcoin.bluewallet123.receiveonchain", "org.groestlcoin.bluewallet123.xpub", "org.groestlcoin.bluewallet123.blockexplorer"].contains(activityType) {
-          EventEmitter.shared().sendUserActivity(userActivityData)
+          EventEmitter.shared()?.sendUserActivity(userActivityData)
             return true
         }
 
