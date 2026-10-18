@@ -42,9 +42,27 @@ describe('Segwit P2SH wallet', () => {
     txNew = wallet.createTransaction(utxos, [{ address: 'FWp7bfoFEfczt1pVQrQddqVXBN9hPvUYqs' }], feeRate, wallet.getAddress());
     tx = bitcoin.Transaction.fromHex(txNew.tx.toHex());
     assert.strictEqual(Math.round((txNew.fee / tx.virtualSize()) * 10), feeRate * 10);
+    assert.ok(txNew.fee >= tx.virtualSize() * feeRate, `fee ${txNew.fee} is below ${feeRate} sat/vbyte for ${tx.virtualSize()} vbytes`);
     assert.strictEqual(tx.ins.length, 1);
     assert.strictEqual(tx.outs.length, 1);
     assert.strictEqual('FWp7bfoFEfczt1pVQrQddqVXBN9hPvUYqs', bitcoin.address.fromOutputScript(tx.outs[0].script)); // to address
+
+    // exact amount, no change and not a send max: still has to pay for every vbyte.
+    // tx is 113 vbytes, so 112 sats left for the fee is not enough
+    assert.throws(
+      () =>
+        wallet.createTransaction(utxos, [{ value: 99888, address: '1GX36PGBUrF8XahZEGQqHqnJGW2vCZteoB' }], feeRate, wallet.getAddress()),
+      /Not enough balance/,
+    );
+    txNew = wallet.createTransaction(
+      utxos,
+      [{ value: 99887, address: '1GX36PGBUrF8XahZEGQqHqnJGW2vCZteoB' }],
+      feeRate,
+      wallet.getAddress(),
+    );
+    tx = bitcoin.Transaction.fromHex(txNew.tx.toHex());
+    assert.strictEqual(tx.outs.length, 1);
+    assert.ok(txNew.fee >= tx.virtualSize() * feeRate, `fee ${txNew.fee} is below ${feeRate} sat/vbyte for ${tx.virtualSize()} vbytes`);
 
     // batch send + send max
     txNew = wallet.createTransaction(
@@ -88,7 +106,7 @@ describe('Segwit P2SH wallet', () => {
     assert.strictEqual(Math.round((txNew.fee / tx.virtualSize()) * 10), feeRate * 10);
     assert.strictEqual(
       txNew.tx.toHex(),
-      '02000000000101ebff950f972e51ea4791f635fef777d5ed0162bacf74f03f5819b976c08bd1570000000000ffffffff02905f0100000000001976a914aa381cd428a4e91327fd4434aa0a08ff131f1a5a88ac352600000000000016001488fefdd8967886b32760995c1c36289f44f7918502483045022100ad3ae70792176c44718c0a3b6fd59012e8ca36b080265b91fcc861b36c3fb06402202fa1317fe07c192581f9eebdb137c5f1ba7d666d07ed6e0548d7dff3669b748401210314cf2bf53f221e58c5adc1dd95adba9239b248f39b09eb2c550aadc1926fe7aa00000000',
+      '02000000000101ebff950f972e51ea4791f635fef777d5ed0162bacf74f03f5819b976c08bd1570000000000ffffffff02905f0100000000001976a914aa381cd428a4e91327fd4434aa0a08ff131f1a5a88ac332600000000000016001488fefdd8967886b32760995c1c36289f44f7918502483045022100830c552ca36dbb0c49b1483edcf5fdc8a2d60898be32c4822c16b5e54dce8b9502207441da284d135e0579882385742e0ec889f435f5146e00b1ffd511f934b6c90101210314cf2bf53f221e58c5adc1dd95adba9239b248f39b09eb2c550aadc1926fe7aa00000000',
     );
     assert.strictEqual(tx.ins.length, 1);
     assert.strictEqual(tx.outs.length, 2);
