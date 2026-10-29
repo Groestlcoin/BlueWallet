@@ -1,4 +1,4 @@
-import b58 from 'bs58check';
+import b58 from 'bs58grscheck';
 
 import { concatUint8Arrays, hexToUint8Array } from '../blue_modules/uint8array-extras';
 import { AbstractWallet } from './wallets/abstract-wallet';

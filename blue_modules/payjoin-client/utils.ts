@@ -1,4 +1,4 @@
-import { Psbt } from 'bitcoinjs-lib';
+import { Psbt } from 'groestlcoinjs-lib';
 import { areUint8ArraysEqual } from '../uint8array-extras';
 import { PayjoinClientOptionalParameters, PsbtInput } from './types';
 

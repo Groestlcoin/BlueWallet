@@ -1,6 +1,6 @@
 import assert from 'assert';
-import * as bitcoin from 'bitcoinjs-lib';
-import { BIP32Factory, BIP32Interface } from 'bip32';
+import * as bitcoin from 'groestlcoinjs-lib';
+import { BIP32Factory, BIP32Interface } from 'bip32grs';
 
 import ecc from '../../../blue_modules/noble_ecc';
 import { hexToUint8Array } from '../../../blue_modules/uint8array-extras';

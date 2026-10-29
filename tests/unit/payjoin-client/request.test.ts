@@ -1,5 +1,5 @@
 import assert from 'assert';
-import * as bitcoin from 'bitcoinjs-lib';
+import * as bitcoin from 'groestlcoinjs-lib';
 import { PAYJOIN_REQUEST_TIMEOUT_MS, PayjoinEndpointError, PayjoinRequester } from '../../../blue_modules/payjoin-client';
 
 // first valid p2wpkh "wallet" vector from upstream test/fixtures/client.fixtures.ts

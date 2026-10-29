@@ -1,4 +1,4 @@
-import { Psbt } from 'bitcoinjs-lib';
+import { Psbt } from 'groestlcoinjs-lib';
 
 // upstream had no deadline: a receiver that never answers would leave the sender hanging with nothing broadcast
 export const PAYJOIN_REQUEST_TIMEOUT_MS = 30 * 1000;

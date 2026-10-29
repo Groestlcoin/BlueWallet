@@ -1,5 +1,5 @@
 import assert from 'assert';
-import * as bitcoin from 'bitcoinjs-lib';
+import * as bitcoin from 'groestlcoinjs-lib';
 import { getEndpointUrl, getInputIndex, getVirtualSize, ScriptPubKeyType } from '../../../blue_modules/payjoin-client';
 
 describe('payjoin-client utils', () => {

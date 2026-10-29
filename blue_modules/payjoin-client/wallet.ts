@@ -1,4 +1,4 @@
-import { Psbt } from 'bitcoinjs-lib';
+import { Psbt } from 'groestlcoinjs-lib';
 
 export interface IPayjoinClientWallet {
   /** Fully signed, finalizable original (non-payjoin) PSBT to submit to the receiver. */

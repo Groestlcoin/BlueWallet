@@ -1,4 +1,4 @@
-import { PsbtTxInput, PsbtTxOutput } from 'bitcoinjs-lib';
+import { PsbtTxInput, PsbtTxOutput } from 'groestlcoinjs-lib';
 import { areUint8ArraysEqual } from '../uint8array-extras';
 import { IPayjoinRequester, PayjoinRequester } from './request';
 import { PayjoinClientOptionalParameters, PsbtInput, PsbtOutput } from './types';
