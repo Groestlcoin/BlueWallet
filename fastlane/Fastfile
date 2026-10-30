@@ -508,8 +508,8 @@ platform :ios do
   # Groups are a Developer Portal capability, so they must be enabled before
   # Match creates a profile for a newly-added extension identifier.
   def ensure_quick_look_app_group!(developer_team_id)
-    group_identifier = "group.io.bluewallet.bluewallet"
-    extension_identifiers = ["io.bluewallet.bluewallet.QuickLookPreview"]
+    group_identifier = "group.org.groestlcoin.bluewallet123"
+    extension_identifiers = ["org.groestlcoin.bluewallet123.QuickLookPreview"]
 
     if !UI.interactive? && ENV["FASTLANE_SESSION"].to_s.empty? && ENV["FASTLANE_PASSWORD"].to_s.empty?
       UI.important(

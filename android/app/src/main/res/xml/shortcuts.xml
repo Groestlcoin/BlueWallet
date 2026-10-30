@@ -7,8 +7,8 @@
         android:shortcutShortLabel="@string/app_shortcut_send">
         <intent
             android:action="android.intent.action.VIEW"
-            android:targetPackage="io.bluewallet.bluewallet"
-            android:targetClass="io.bluewallet.bluewallet.MainActivity"
+            android:targetPackage="org.groestlcoin.bluewallet"
+            android:targetClass="org.groestlcoin.bluewallet.MainActivity"
             android:data="bluewallet://send" />
     </shortcut>
     <shortcut
@@ -18,8 +18,8 @@
         android:shortcutShortLabel="@string/app_shortcut_receive">
         <intent
             android:action="android.intent.action.VIEW"
-            android:targetPackage="io.bluewallet.bluewallet"
-            android:targetClass="io.bluewallet.bluewallet.MainActivity"
+            android:targetPackage="org.groestlcoin.bluewallet"
+            android:targetClass="org.groestlcoin.bluewallet.MainActivity"
             android:data="bluewallet://receive" />
     </shortcut>
     <shortcut
@@ -29,8 +29,8 @@
         android:shortcutShortLabel="@string/app_shortcut_scan">
         <intent
             android:action="android.intent.action.VIEW"
-            android:targetPackage="io.bluewallet.bluewallet"
-            android:targetClass="io.bluewallet.bluewallet.MainActivity"
+            android:targetPackage="org.groestlcoin.bluewallet"
+            android:targetClass="org.groestlcoin.bluewallet.MainActivity"
             android:data="bluewallet://scan" />
     </shortcut>
     <shortcut
@@ -40,8 +40,8 @@
         android:shortcutShortLabel="@string/app_shortcut_manage_wallets">
         <intent
             android:action="android.intent.action.VIEW"
-            android:targetPackage="io.bluewallet.bluewallet"
-            android:targetClass="io.bluewallet.bluewallet.MainActivity"
+            android:targetPackage="org.groestlcoin.bluewallet"
+            android:targetClass="org.groestlcoin.bluewallet.MainActivity"
             android:data="bluewallet://manage-wallets" />
     </shortcut>
 </shortcuts>
