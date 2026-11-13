@@ -1,11 +1,11 @@
 import assert from 'assert';
-import * as bitcoin from 'bitcoinjs-lib';
+import * as bitcoin from 'groestlcoinjs-lib';
 
 import { HDSegwitBech32Transaction, TxVerificationError } from '../../class/hd-segwit-bech32-transaction';
 import { HDSegwitBech32Wallet } from '../../class/wallets/hd-segwit-bech32-wallet';
 import { uint8ArrayToHex } from '../../blue_modules/uint8array-extras';
 import ecc from '../../blue_modules/noble_ecc';
-import { ECPairFactory } from 'ecpair';
+import { ECPairFactory } from 'ecpairgrs';
 
 // what a (possibly malicious) Electrum server answers, keyed by txid
 const serverHex: Record<string, any> = {};
