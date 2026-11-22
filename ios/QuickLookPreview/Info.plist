@@ -26,9 +26,9 @@
 			<false/>
 			<key>QLSupportedContentTypes</key>
 			<array>
-				<string>io.bluewallet.bip329</string>
-				<string>io.bluewallet.psbt</string>
-				<string>io.bluewallet.psbt.txn</string>
+				<string>org.groestlcoin.bip329</string>
+				<string>org.groestlcoin.psbt</string>
+				<string>org.groestlcoin.psbt.txn</string>
 			</array>
 			<key>QLSupportsSearchableItems</key>
 			<false/>

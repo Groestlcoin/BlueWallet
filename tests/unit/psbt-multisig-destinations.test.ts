@@ -1,5 +1,5 @@
 import assert from 'assert';
-import * as bitcoin from 'bitcoinjs-lib';
+import * as bitcoin from 'groestlcoinjs-lib';
 
 import { MultisigHDWallet } from '../../class/wallets/multisig-hd-wallet';
 import { getDestinationData } from '../../screen/send/psbtMultisig';

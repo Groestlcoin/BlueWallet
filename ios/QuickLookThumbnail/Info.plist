@@ -22,8 +22,8 @@
 		<dict>
 			<key>QLSupportedContentTypes</key>
 			<array>
-				<string>io.bluewallet.psbt</string>
-				<string>io.bluewallet.psbt.txn</string>
+				<string>org.groestlcoin.psbt</string>
+				<string>org.groestlcoin.psbt.txn</string>
 			</array>
 		</dict>
 		<key>NSExtensionPointIdentifier</key>

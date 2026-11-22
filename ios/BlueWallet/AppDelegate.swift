@@ -446,7 +446,7 @@ class AppDelegate: RCTAppDelegate, UNUserNotificationCenterDelegate {
             ("keyboardShortcuts", "Keyboard Shortcuts…", "keyboard", #selector(keyboardShortcutsMenuAction), "/", .command, .help)
         ]
         for parent in [UIMenu.Identifier.file, .edit, .view, .help] {
-            let identifier = UIMenu.Identifier("io.bluewallet.commands.\(parent.rawValue)")
+            let identifier = UIMenu.Identifier("org.groestlcoin.commands.\(parent.rawValue)")
             builder.remove(menu: identifier)
             let children = commands.filter { actions.contains($0.0) && $0.6 == parent }.map { command -> UICommand in
                 let title = MenuActionsController.shared.title(for: command.0, fallback: command.1)
@@ -462,7 +462,7 @@ class AppDelegate: RCTAppDelegate, UNUserNotificationCenterDelegate {
             }
         }
 
-        let sendDetailsMenuID = UIMenu.Identifier("io.bluewallet.sendDetails")
+        let sendDetailsMenuID = UIMenu.Identifier("org.groestlcoin.sendDetails")
         builder.remove(menu: sendDetailsMenuID)
         let sendDetailsCommands: [(String, String, String, String, UIKeyModifierFlags)] = [
             ("add_recipient", "Add Recipient", "person.badge.plus", "a", [.command, .alternate]),
@@ -521,7 +521,7 @@ class AppDelegate: RCTAppDelegate, UNUserNotificationCenterDelegate {
                 if let menu = element as? UIMenu {
                     let isOpenRecent = menu.identifier == .openRecent
                     let children = isOpenRecent ? recentItems : replacingSystemFileCommands(menu.children)
-                    let identifier = isOpenRecent ? UIMenu.Identifier("io.bluewallet.openRecent") : menu.identifier
+                    let identifier = isOpenRecent ? UIMenu.Identifier("org.groestlcoin.openRecent") : menu.identifier
                     return UIMenu(title: menu.title, image: menu.image, identifier: identifier,
                                   options: menu.options, children: children)
                 }
@@ -542,8 +542,8 @@ class AppDelegate: RCTAppDelegate, UNUserNotificationCenterDelegate {
         }
         builder.replaceChildren(ofMenu: .file, from: replacingSystemFileCommands)
 
-        let settingsMenuID = UIMenu.Identifier("io.bluewallet.settings")
-        let toolsMenuID = UIMenu.Identifier("io.bluewallet.tools")
+        let settingsMenuID = UIMenu.Identifier("org.groestlcoin.settings")
+        let toolsMenuID = UIMenu.Identifier("org.groestlcoin.tools")
         builder.remove(menu: settingsMenuID)
         builder.remove(menu: toolsMenuID)
         if actions.contains("settings") {
