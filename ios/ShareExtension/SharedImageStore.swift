@@ -2,11 +2,11 @@ import Foundation
 import Darwin
 
 struct SharedImageStore {
-    static let appGroup = "group.io.bluewallet.bluewallet"
+    static let appGroup = "group.org.groestlcoin.bluewallet123"
     static let pendingImageKey = "pendingSharedImageFilename"
     static let sharedImagesDirectory = "shared-images"
     static let notificationName = CFNotificationName(
-        "io.bluewallet.bluewallet.shared-image-imported" as CFString
+        "org.groestlcoin.bluewallet123.shared-image-imported" as CFString
     )
 
     let containerURL: URL

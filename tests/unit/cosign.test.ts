@@ -7,7 +7,7 @@ import { HDSegwitBech32Wallet } from '../../class/wallets/hd-segwit-bech32-walle
 import { HDSegwitP2SHWallet } from '../../class/wallets/hd-segwit-p2sh-wallet';
 import { WatchOnlyWallet } from '../../class/wallets/watch-only-wallet';
 import { CreateTransactionUtxo } from '../../class/wallets/types.ts';
-import { Transaction } from 'bitcoinjs-lib';
+import { Transaction } from 'groestlcoinjs-lib';
 import { hexToUint8Array } from '../../blue_modules/uint8array-extras/index';
 
 describe('AbstractHDElectrumWallet.cosign', () => {

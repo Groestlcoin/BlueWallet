@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, Platform, ScrollView, StyleSheet, View } from 'react-native';
-import type { Psbt, Transaction } from 'bitcoinjs-lib';
+import type { Psbt, Transaction } from 'groestlcoinjs-lib';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import * as BlueElectrum from '../../blue_modules/BlueElectrum';
 import triggerHapticFeedback, { HapticFeedbackTypes } from '../../blue_modules/hapticFeedback';

@@ -32,7 +32,7 @@ const TxHex: React.FC<{ hex: string }> = ({ hex }) => {
       <Pressable
         accessibilityRole="button"
         style={({ pressed }) => [styles.action, pressed && styles.pressed]}
-        onPress={() => Linking.openURL('https://coinb.in/?verify=' + hex)}
+        onPress={() => Linking.openURL('https://www.groestlcoin.org/webwallet/?verify=' + hex)}
       >
         <Text style={styles.actionText}>{loc.send.create_verify}</Text>
       </Pressable>
