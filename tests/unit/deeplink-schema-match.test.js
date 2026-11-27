@@ -3,6 +3,12 @@ import assert from 'assert';
 import DeeplinkSchemaMatch from '../../class/deeplink-schema-match';
 import { HDSegwitBech32Wallet } from '../../class/wallets/hd-segwit-bech32-wallet';
 import { LightningCustodianWallet } from '../../class/wallets/lightning-custodian-wallet';
+import { WatchOnlyWallet } from '../../class/wallets/watch-only-wallet';
+import presentAlert from '../../components/Alert';
+import loc from '../../loc';
+
+jest.mock('../../components/Alert');
+jest.mock('../../blue_modules/hapticFeedback');
 
 jest.mock('../../blue_modules/BlueElectrum', () => {
   return {
@@ -10,12 +16,31 @@ jest.mock('../../blue_modules/BlueElectrum', () => {
   };
 });
 
+const onchainWallet = new HDSegwitBech32Wallet();
+const lightningWallet = new LightningCustodianWallet();
+const watchOnlyWallet = new WatchOnlyWallet();
+watchOnlyWallet.setSecret(
+  'zpub6rFDtF1nuXZ9PUL4XzKURh3vJBW6Kj6TUrYL4qPtFNtDXtcTVfiqjQDyrZNwjwzt5HS14qdqo3Co2282Lv3Re6Y5wFZxAVuMEpeygnnDwfx',
+);
+
+const contextFor = (wallets, preferredWalletID) => ({
+  wallets,
+  saveToDisk: () => {},
+  addWallet: () => {},
+  setSharedCosigner: () => {},
+  preferredWalletID,
+});
+
 // helper function that promisifies function with a callback:
-const asyncNavigationRouteFor = async function (event) {
+const asyncNavigationRouteFor = async function (event, context = contextFor([onchainWallet, lightningWallet])) {
   return new Promise(function (resolve) {
-    DeeplinkSchemaMatch.navigationRouteFor(event, navValue => {
-      resolve(navValue);
-    });
+    DeeplinkSchemaMatch.navigationRouteFor(
+      event,
+      navValue => {
+        resolve(navValue);
+      },
+      context,
+    );
   });
 };
 
@@ -123,8 +148,16 @@ describe.each(['', '//'])('unit - DeepLinkSchemaMatch', function (suffix) {
   it('navigationForRoute', async () => {
     const events = [
       {
-        argument: { url: 'FWp7bfoFEfczt1pVQrQddqVXBN9hPvUYqs' },
-        expected: ['SendDetailsRoot', { screen: 'SendDetails', params: { uri: 'FWp7bfoFEfczt1pVQrQddqVXBN9hPvUYqs' } }],
+        argument: { url: `FWp7bfoFEfczt1pVQrQddqVXBN9hPvUYqs` },
+        expected: [
+          'SendDetailsRoot',
+          {
+            screen: 'SendDetails',
+            merge: true,
+            pop: true,
+            params: { uri: 'FWp7bfoFEfczt1pVQrQddqVXBN9hPvUYqs', walletID: onchainWallet.getID() },
+          },
+        ],
       },
       {
         argument: {
@@ -134,8 +167,11 @@ describe.each(['', '//'])('unit - DeepLinkSchemaMatch', function (suffix) {
           'SendDetailsRoot',
           {
             screen: 'SendDetails',
+            merge: true,
+            pop: true,
             params: {
               uri: 'sp1qqgste7k9hx0qftg6qmwlkqtwuy6cycyavzmzj85c6qdfhjdpdjtdgqjuexzk6murw56suy3e0rd2cgqvycxttddwsvgxe2usfpxumr70xc9pkqwv',
+              walletID: onchainWallet.getID(),
             },
           },
         ],
@@ -148,28 +184,49 @@ describe.each(['', '//'])('unit - DeepLinkSchemaMatch', function (suffix) {
           'SendDetailsRoot',
           {
             screen: 'SendDetails',
+            merge: true,
+            pop: true,
             params: {
               uri: 'PM8TJS2JxQ5ztXUpBBRnpTbcUXbUHy2T1abfrb3KkAAtMEGNbey4oumH7Hc578WgQJhPjBxteQ5GHHToTYHE3A1w6p7tU6KSoFmWBVbFGjKPisZDbP97',
+              walletID: onchainWallet.getID(),
             },
           },
         ],
       },
       {
         argument: { url: `groestlcoin:${suffix}12eQ9m4sgAwTSQoNXkRABKhCXCsjm2jdVG` },
-        expected: ['SendDetailsRoot', { screen: 'SendDetails', params: { uri: 'groestlcoin:12eQ9m4sgAwTSQoNXkRABKhCXCsjm2jdVG' } }],
+        expected: [
+          'SendDetailsRoot',
+          {
+            screen: 'SendDetails',
+            merge: true,
+            pop: true,
+            params: { uri: 'groestlcoin:12eQ9m4sgAwTSQoNXkRABKhCXCsjm2jdVG', walletID: onchainWallet.getID() },
+          },
+        ],
       },
       {
         argument: { url: 'GROESTLCOIN:${suffix}GRS1Q44JTK2QL0XTGJPDWRYSZWC7W8TSW30HP6YCT3X?amount=666&label=Yo' },
         expected: [
           'SendDetailsRoot',
-          { screen: 'SendDetails', params: { uri: 'GROESTLCOIN:GRS1Q44JTK2QL0XTGJPDWRYSZWC7W8TSW30HP6YCT3X?amount=666&label=Yo' } },
+          {
+            screen: 'SendDetails',
+            merge: true,
+            pop: true,
+            params: { uri: 'GROESTLCOIN:GRS1Q44JTK2QL0XTGJPDWRYSZWC7W8TSW30HP6YCT3X?amount=666&label=Yo', walletID: onchainWallet.getID() },
+          },
         ],
       },
       {
         argument: { url: 'bluewallet:GROESTLCOIN:${suffix}GRS1Q44JTK2QL0XTGJPDWRYSZWC7W8TSW30HP6YCT3X?amount=666&label=Yo' },
         expected: [
           'SendDetailsRoot',
-          { screen: 'SendDetails', params: { uri: 'GROESTLCOIN:GRS1Q44JTK2QL0XTGJPDWRYSZWC7W8TSW30HP6YCT3X?amount=666&label=Yo' } },
+          {
+            screen: 'SendDetails',
+            merge: true,
+            pop: true,
+            params: { uri: 'GROESTLCOIN:GRS1Q44JTK2QL0XTGJPDWRYSZWC7W8TSW30HP6YCT3X?amount=666&label=Yo', walletID: onchainWallet.getID() },
+          },
         ],
       },
       {
@@ -182,6 +239,7 @@ describe.each(['', '//'])('unit - DeepLinkSchemaMatch', function (suffix) {
             screen: 'ScanLNDInvoice',
             params: {
               uri: 'lightning:lngrs10u1pwjqwkkpp5vlc3tttdzhpk9fwzkkue0sf2pumtza7qyw9vucxyyeh0yaqq66yqdq5f38z6mmwd3ujqar9wd6qcqzpgxq97zvuqrzjqvgptfurj3528snx6e3dtwepafxw5fpzdymw9pj20jj09sunnqmwqz9hx5qqtmgqqqqqqqlgqqqqqqgqjq5duu3fs9xq9vn89qk3ezwpygecu4p3n69wm3tnl28rpgn2gmk5hjaznemw0gy32wrslpn3g24khcgnpua9q04fttm2y8pnhmhhc2gncplz0zde',
+              walletID: lightningWallet.getID(),
             },
           },
         ],
@@ -196,6 +254,7 @@ describe.each(['', '//'])('unit - DeepLinkSchemaMatch', function (suffix) {
             screen: 'ScanLNDInvoice',
             params: {
               uri: 'lightning:lngrs10u1pwjqwkkpp5vlc3tttdzhpk9fwzkkue0sf2pumtza7qyw9vucxyyeh0yaqq66yqdq5f38z6mmwd3ujqar9wd6qcqzpgxq97zvuqrzjqvgptfurj3528snx6e3dtwepafxw5fpzdymw9pj20jj09sunnqmwqz9hx5qqtmgqqqqqqqlgqqqqqqgqjq5duu3fs9xq9vn89qk3ezwpygecu4p3n69wm3tnl28rpgn2gmk5hjaznemw0gy32wrslpn3g24khcgnpua9q04fttm2y8pnhmhhc2gncplz0zde',
+              walletID: lightningWallet.getID(),
             },
           },
         ],
@@ -262,6 +321,7 @@ describe.each(['', '//'])('unit - DeepLinkSchemaMatch', function (suffix) {
             screen: 'LNDCreateInvoice',
             params: {
               uri: 'https://lnbits.com/?lightning=LNURL1DP68GURN8GHJ7MRWVF5HGUEWVDHK6TMHD96XSERJV9MJ7CTSDYHHVVF0D3H82UNV9UM9JDENFPN5SMMK2359J5RKWVMKZ5ZVWAV4VJD63TM',
+              walletID: lightningWallet.getID(),
             },
           },
         ],
@@ -288,6 +348,7 @@ describe.each(['', '//'])('unit - DeepLinkSchemaMatch', function (suffix) {
             screen: 'ScanLNDInvoice',
             params: {
               uri: 'lnaddress@zbd.gg',
+              walletID: lightningWallet.getID(),
             },
           },
         ],
@@ -444,10 +505,10 @@ describe.each(['', '//'])('unit - DeepLinkSchemaMatch', function (suffix) {
     // BIP78: pjos=0 means the sender MUST disallow payment output substitution
     assert.deepStrictEqual(
       DeeplinkSchemaMatch.decodeBitcoinUri(
-        `bitcoin:${suffix}bc1qnapskphjnwzw2w3dk4anpxntunc77v6qrua0f7?amount=0.0001&pj=https://grspay.com/GRS/pj&pjos=0`,
+        `groestlcoin:${suffix}grs1q6ve7qrz0gg9tt22022rx620uepkpkk2ed286gw?amount=0.0001&pj=https://grspay.com/GRS/pj&pjos=0`,
       ),
       {
-        address: 'grs1qnapskphjnwzw2w3dk4anpxntunc77v6qrua0f7',
+        address: 'grs1q6ve7qrz0gg9tt22022rx620uepkpkk2ed286gw',
         amount: 0.0001,
         memo: '',
         payjoinUrl: 'https://grspay.com/GRS/pj',
@@ -536,7 +597,7 @@ describe.each(['', '//'])('unit - DeepLinkSchemaMatch', function (suffix) {
 
   it('onWalletSelect should work', async () => {
     const response = await asyncNavigationRouteFor({
-      url: 'bitcoin:BC1QR7P8NSYPZEJY4KP7CJS0HL5T9X0VF3AYF6UQPC?amount=0.00185579&lightning=LNBC1855790N1PNUPWSFPP5P5RVQJA067PV6NJQ3EFKLP78TN6MHUK842ZFGDCTXRDSGNTY765QDZ62PSKJEPQW3HJQSNPD36XJCEQFPHKUETEVFSKGEM9WGSRYVPJXSSZSNMJV3JHYGZFGSAZQARFVD4K2AR5V95KCMMJ9YCQZPUXQZ6GSP53E4EX9YTD2MGDN2C2CFA0J0SM3E7PVLPJ208H5LMYPNJMGZ7RLGS9QXPQYSGQ6GQMEQXJKKF2DHXJK8XQ4WGLM5NTE3RKEXGYQC6HYGFKS9SHHA6HL9X4339MXHNNQFSH7TS62PU8T9RSWTK6HQ4LV4GW3DPD25DQ8UQQYC909N',
+      url: 'groestlcoin:GRS1Q6VE7QRZ0GG9TT22022RX620UEPKPKK2ED286GW?amount=0.00185579&lightning=LNBC1855790N1PNUPWSFPP5P5RVQJA067PV6NJQ3EFKLP78TN6MHUK842ZFGDCTXRDSGNTY765QDZ62PSKJEPQW3HJQSNPD36XJCEQFPHKUETEVFSKGEM9WGSRYVPJXSSZSNMJV3JHYGZFGSAZQARFVD4K2AR5V95KCMMJ9YCQZPUXQZ6GSP53E4EX9YTD2MGDN2C2CFA0J0SM3E7PVLPJ208H5LMYPNJMGZ7RLGS9QXPQYSGQ6GQMEQXJKKF2DHXJK8XQ4WGLM5NTE3RKEXGYQC6HYGFKS9SHHA6HL9X4339MXHNNQFSH7TS62PU8T9RSWTK6HQ4LV4GW3DPD25DQ8UQQYC909N',
     });
     assert.ok(response[1].onWalletSelect);
 
@@ -579,10 +640,12 @@ describe.each(['', '//'])('unit - DeepLinkSchemaMatch', function (suffix) {
           'SendDetailsRoot',
           {
             params: {
-              uri: 'bitcoin:BC1QR7P8NSYPZEJY4KP7CJS0HL5T9X0VF3AYF6UQPC?amount=0.00185579&',
+              uri: 'groestlcoin:GRS1Q6VE7QRZ0GG9TT22022RX620UEPKPKK2ED286GW?amount=0.00185579&',
               walletID: 'a1c50c266e229bb66aca0221d5b6a116720004c97437a0a6e279cfea027d0c87',
             },
             screen: 'SendDetails',
+            merge: true,
+            pop: true,
           },
         ]);
       },
@@ -596,5 +659,113 @@ describe.each(['', '//'])('unit - DeepLinkSchemaMatch', function (suffix) {
 
     assert.ok(popWasCalled2);
     assert.ok(navigateWasCalled2);
+  });
+});
+
+describe('unit - DeepLinkSchemaMatch picks a wallet', () => {
+  const invoice =
+    'lightning:lnbc10u1pwjqwkkpp5vlc3tttdzhpk9fwzkkue0sf2pumtza7qyw9vucxyyeh0yaqq66yqdq5f38z6mmwd3ujqar9wd6qcqzpgxq97zvuqrzjqvgptfurj3528snx6e3dtwepafxw5fpzdymw9pj20jj09sunnqmwqz9hx5qqtmgqqqqqqqlgqqqqqqgqjq5duu3fs9xq9vn89qk3ezwpygecu4p3n69wm3tnl28rpgn2gmk5hjaznemw0gy32wrslpn3g24khcgnpua9q04fttm2y8pnhmhhc2gncplz0zde';
+  const address = 'bitcoin:12eQ9m4sgAwTSQoNXkRABKhCXCsjm2jdVG';
+  const lnurl =
+    'https://lnbits.com/?lightning=LNURL1DP68GURN8GHJ7MRWVF5HGUEWVDHK6TMHD96XSERJV9MJ7CTSDYHHVVF0D3H82UNV9UM9JDENFPN5SMMK2359J5RKWVMKZ5ZVWAV4VJD63TM';
+
+  const paymentCode =
+    'PM8TJS2JxQ5ztXUpBBRnpTbcUXbUHy2T1abfrb3KkAAtMEGNbey4oumH7Hc578WgQJhPjBxteQ5GHHToTYHE3A1w6p7tU6KSoFmWBVbFGjKPisZDbP97';
+
+  const secondOnchainWallet = new HDSegwitBech32Wallet();
+  secondOnchainWallet.setSecret('abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about');
+
+  beforeEach(() => {
+    presentAlert.mockClear();
+  });
+
+  it('skips wallets that cant send on the right chain', async () => {
+    assert.strictEqual(watchOnlyWallet.allowSend(), false);
+
+    const send = await asyncNavigationRouteFor({ url: address }, contextFor([lightningWallet, watchOnlyWallet, onchainWallet]));
+    assert.strictEqual(send[1].params.walletID, onchainWallet.getID());
+  });
+
+  it('prefers the given wallet only if it is suitable', async () => {
+    const wallets = [onchainWallet, secondOnchainWallet, lightningWallet];
+
+    const preferred = await asyncNavigationRouteFor({ url: address }, contextFor(wallets, secondOnchainWallet.getID()));
+    assert.strictEqual(preferred[1].params.walletID, secondOnchainWallet.getID());
+
+    const wrongChain = await asyncNavigationRouteFor({ url: address }, contextFor(wallets, lightningWallet.getID()));
+    assert.strictEqual(wrongChain[1].params.walletID, onchainWallet.getID());
+
+    const secondLightningWallet = new LightningCustodianWallet();
+    secondLightningWallet.setSecret('lndhub://login:password');
+    assert.notStrictEqual(secondLightningWallet.getID(), lightningWallet.getID());
+    const preferredLightning = await asyncNavigationRouteFor(
+      { url: invoice },
+      contextFor([lightningWallet, secondLightningWallet], secondLightningWallet.getID()),
+    );
+    assert.strictEqual(preferredLightning[1].params.walletID, secondLightningWallet.getID());
+  });
+
+  it('alerts instead of navigating when there is no suitable wallet', () => {
+    const cases = [
+      { url: address, wallets: [], message: loc.send.details_wallet_before_tx },
+      { url: address, wallets: [lightningWallet, watchOnlyWallet], message: loc.send.details_wallet_before_tx },
+      { url: invoice, wallets: [onchainWallet], message: loc.wallets.no_ln_wallet_error },
+      { url: lnurl, wallets: [onchainWallet], message: loc.wallets.no_ln_wallet_error },
+      { url: 'lnaddress@zbd.gg', wallets: [onchainWallet], message: loc.wallets.no_ln_wallet_error },
+      { url: paymentCode, wallets: [lightningWallet], message: loc.send.details_wallet_before_tx },
+      { url: 'bluewallet://widget?action=openSend', wallets: [], message: loc.send.details_wallet_before_tx },
+      { url: 'bluewallet://widget?action=openReceive', wallets: [], message: loc.wallets.select_no_bitcoin },
+    ];
+
+    for (const { url, wallets, message } of cases) {
+      presentAlert.mockClear();
+      const completionHandler = jest.fn();
+      DeeplinkSchemaMatch.navigationRouteFor({ url }, completionHandler, contextFor(wallets));
+      assert.strictEqual(completionHandler.mock.calls.length, 0, url);
+      assert.strictEqual(presentAlert.mock.calls.length, 1, url);
+      assert.strictEqual(presentAlert.mock.calls[0][0].message, message);
+    }
+  });
+
+  it('widget actions use the first wallet able to do the action', async () => {
+    const send = await asyncNavigationRouteFor(
+      { url: 'bluewallet://widget?action=openSend' },
+      contextFor([watchOnlyWallet, lightningWallet, onchainWallet]),
+    );
+    assert.deepStrictEqual(send, ['ScanLNDInvoiceRoot', { screen: 'ScanLNDInvoice', params: { walletID: lightningWallet.getID() } }]);
+
+    const receive = await asyncNavigationRouteFor(
+      { url: 'bluewallet://widget?action=openReceive' },
+      contextFor([watchOnlyWallet, lightningWallet, onchainWallet]),
+    );
+    assert.deepStrictEqual(receive, [
+      'DrawerRoot',
+      { screen: 'DetailViewStackScreensStack', params: { screen: 'ReceiveDetails', params: { walletID: watchOnlyWallet.getID() } } },
+    ]);
+
+    const onchainSend = await asyncNavigationRouteFor(
+      { url: 'bluewallet://widget?action=openSend' },
+      contextFor([onchainWallet, lightningWallet]),
+    );
+    assert.deepStrictEqual(onchainSend, [
+      'SendDetailsRoot',
+      { screen: 'SendDetails', merge: true, pop: true, params: { walletID: onchainWallet.getID() } },
+    ]);
+
+    const lightningReceive = await asyncNavigationRouteFor(
+      { url: 'bluewallet://widget?action=openReceive' },
+      contextFor([lightningWallet, onchainWallet]),
+    );
+    assert.deepStrictEqual(lightningReceive, [
+      'LNDCreateInvoiceRoot',
+      { screen: 'LNDCreateInvoice', params: { walletID: lightningWallet.getID() } },
+    ]);
+
+    const preferredSend = await asyncNavigationRouteFor(
+      { url: 'bluewallet://widget?action=openSend' },
+      contextFor([lightningWallet, onchainWallet], onchainWallet.getID()),
+    );
+    assert.strictEqual(preferredSend[1].params.walletID, onchainWallet.getID());
+    assert.strictEqual(presentAlert.mock.calls.length, 0);
   });
 });
